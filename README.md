@@ -2,7 +2,7 @@
 
 Platforma de volunatariat
 
-O platforma in care utilizatorii pot participa la diferite actiuni de voluntariat. Platforma poate contine 2 tipuri de useri:
+O platforma in care utilizatorii pot participa la diferite actiuni de voluntariat. Platforma poate contine 3 tipuri de useri:
 a) voluntar 
 b) beneficiar
 c) admin.
