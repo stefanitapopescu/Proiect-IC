@@ -20,7 +20,7 @@ function Signup() {
     try {
       await axios.post('http://localhost:8080/api/auth/signup', formData);
       alert("Account created!");
-      navigate('/');
+      //navigate('/');
     } catch (err) {
       alert("Error: " + err.response.data);
     }
@@ -38,8 +38,8 @@ function Signup() {
         </select>
         <button type="submit">Sign Up</button>
       </form>
-      <p>Already have an account? <span onClick={() => navigate('/')}>Login</span></p>
-    </div>
+      <p>Already have an account? <span onClick={() => navigate('/login')}>Login</span></p>
+      </div>
   );
 }
 

@@ -1,0 +1,40 @@
+/* src/pages/Home.css */
+.home-container {
+    height: 100vh;
+    background: linear-gradient(to right, #00b09b, #96c93d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .home-content {
+    color: white;
+    text-align: center;
+    max-width: 600px;
+  }
+  
+  .home-content h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .home-content p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .home-content button {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    background-color: white;
+    color: #00b09b;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .home-content button:hover {
+    background-color: #e0e0e0;
+  }
+  
