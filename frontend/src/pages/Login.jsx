@@ -13,8 +13,19 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8080/api/auth/login', formData);
+      const res = await axios.post('http://localhost:8080/api/auth/login', formData);
+      // Presupunem că răspunsul este un text de forma "Login successful. Token: <token>"
+      const tokenPrefix = "Login successful. Token: ";
+      const token = res.data.substring(tokenPrefix.length).trim();
+      
+      // Stochează tokenul în localStorage
+      localStorage.setItem("token", token);
+      
+      // Setează header-ul Authorization implicit pentru Axios
+      axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+      
       alert("Login successful!");
+      navigate("/");
     } catch (err) {
       alert("Login failed: " + err.response.data);
     }
