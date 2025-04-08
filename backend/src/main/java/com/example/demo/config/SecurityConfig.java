@@ -27,15 +27,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors(Customizer.withDefaults())  // Activăm suportul CORS
             .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**", "/error").permitAll()  // Permite accesul și la /error
-            .anyRequest().authenticated()
+                .requestMatchers("/api/auth/**", "/api/test", "/error").permitAll()
+                .anyRequest().authenticated()
             )
-            // Adaugi filtrul JWT înainte de UsernamePasswordAuthenticationFilter
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     
         return http.build();
     }
+    
 }    

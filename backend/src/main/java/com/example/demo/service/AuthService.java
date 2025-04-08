@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.example.demo.dto.LoginResponse;
 
 import java.util.Optional;
 
@@ -36,19 +37,17 @@ public class AuthService {
 
     public ResponseEntity<?> login(User user) {
         Optional<User> existingUser = userRepo.findByUsername(user.getUsername());
-    
         if (existingUser.isPresent()) {
-            // Compară parola din request (în clar) cu hash-ul salvat
             boolean matches = passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword());
-    
             if (matches) {
                 String token = jwtUtil.generateToken(user.getUsername());
-                String responseMessage = "Login successful. Token: " + token;
-                return ResponseEntity.ok(responseMessage);
+                // Creează răspunsul JSON cu token și rolul utilizatorului
+                LoginResponse response = new LoginResponse(token, existingUser.get().getRole());
+                return ResponseEntity.ok(response);
             }
         }
-    
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                              .body("Invalid credentials.");
     }
-}
+    
+}    

@@ -7,25 +7,31 @@ function Login() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({...formData, [e.target.name]: e.target.value});
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:8080/api/auth/login', formData);
-      // Presupunem că răspunsul este un text de forma "Login successful. Token: <token>"
-      const tokenPrefix = "Login successful. Token: ";
-      const token = res.data.substring(tokenPrefix.length).trim();
+      // Se presupune că răspunsul este un obiect JSON cu token și role
+      const { token, role } = res.data;
       
       // Stochează tokenul în localStorage
       localStorage.setItem("token", token);
-      
-      // Setează header-ul Authorization implicit pentru Axios
+      // Setează header-ul Authorization pentru toate cererile Axios
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
       
       alert("Login successful!");
-      navigate("/");
+
+      // Redirecționează în funcție de rol
+      if (role === 'volunteer') {
+         navigate("/volunteer");
+      } else if (role === 'entity') {
+         navigate("/entity");
+      } else {
+         navigate("/");
+      }
     } catch (err) {
       alert("Login failed: " + err.response.data);
     }
