@@ -1,4 +1,4 @@
-import './axiosConfig'; // Asigură-te că acesta este importat înainte de rest
+import './axiosConfig';  // Asigură-te că interceptorul Axios este importat
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
