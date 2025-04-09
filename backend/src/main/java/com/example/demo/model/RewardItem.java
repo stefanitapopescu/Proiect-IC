@@ -4,15 +4,15 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "users")
+@Document(collection = "rewardItems")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class RewardItem {
     @Id
     private String id;
-    private String username;
-    private String password;
-    private String role; 
-    private Integer points = 0; // câmp nou, inițial 0
+    private String name;
+    private int quantity;
+    // Legătură către acțiunea de voluntariat pentru care este oferit acest premiu
+    private String volunteerActionId;
 }
