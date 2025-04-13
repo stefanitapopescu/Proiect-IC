@@ -16,7 +16,7 @@ import java.security.Key;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "thisisaverysecretkeythatis32char"; // Folosește o cheie mai sigură în producție
+    private final String SECRET_KEY = "thisisaverysecretkeythatis32char";//cheie folosita pt criptare
 
     public String generateToken(String username) {
         byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);

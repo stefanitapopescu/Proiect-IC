@@ -15,7 +15,7 @@ public class VolunteerAction {
     private String title;
     private String description;
     private String location;
-    private String type; // de exemplu: "plantare de copaci", "reciclare" etc.
+    private String type;
     private int requestedVolunteers;
     private int allocatedVolunteers;
     private LocalDateTime actionDate;

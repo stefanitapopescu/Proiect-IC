@@ -9,7 +9,7 @@ public class NewVolunteerActionRequest {
     private String title;
     private String description;
     private String location;
-    private String type; // tipul actiunii, de ex.: "plantare de copaci"
+    private String type; // tipul actiunii
     private int requestedVolunteers;
     private LocalDateTime actionDate;
     private List<RewardItemDTO> rewardItems;

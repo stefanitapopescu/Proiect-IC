@@ -29,12 +29,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
                 
-    // Debug: afișează calea cererii
+   
     logger.info("getRequestURI: " + request.getRequestURI());
     logger.info("getServletPath: " + request.getServletPath());
         String path = request.getServletPath();
     
-        // Dacă este vorba de /api/auth/... atunci nu forțăm validarea token-ului
+      
         if (path.startsWith("/api/auth")) {
             chain.doFilter(request, response);
             return;
