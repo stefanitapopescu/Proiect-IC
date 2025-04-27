@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Volunteer.css';
 
@@ -6,6 +7,7 @@ function Volunteer() {
   const [actions, setActions] = useState([]);
   const [signupMessages, setSignupMessages] = useState({});
   const [joinedActions, setJoinedActions] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get("http://localhost:8080/api/volunteer/actions")
@@ -16,6 +18,11 @@ function Volunteer() {
         console.error("Eroare la încărcarea acțiunilor: ", error);
       });
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   const handleSignup = (actionId) => {
     if (joinedActions[actionId]) {
@@ -38,11 +45,12 @@ function Volunteer() {
           ...prev,
           [actionId]: { message: errorMessage, type: 'error' }
         }));
-      });      
+      });
   };
 
   return (
     <div className="volunteer-page">
+      <button className="logout-button" onClick={handleLogout}>Logout</button>
       <h2>Volunteer Dashboard</h2>
       <div className="volunteer-list">
         {actions.map(action => (

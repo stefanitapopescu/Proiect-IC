@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "./Entity.css";
 
 function Entity() {
   const [formData, setFormData] = useState({
@@ -13,10 +15,9 @@ function Entity() {
   });
 
   const [rewardItem, setRewardItem] = useState({ name: "", quantity: 0 });
-
   const [useRewardItems, setUseRewardItems] = useState(false);
-
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -47,7 +48,6 @@ function Entity() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Dacă opțiunea de adăugare reward items nu este bifată, setăm rewardItems la un array gol
     const finalFormData = {
       ...formData,
       rewardItems: useRewardItems ? formData.rewardItems : [],
@@ -64,7 +64,7 @@ function Entity() {
     axios
       .post("http://localhost:8080/api/entity/post-action", finalFormData)
       .then((response) => {
-        setMessage(response.data); // "Acțiunea de voluntariat a fost postată cu succes!"
+        setMessage(response.data);
       })
       .catch((error) => {
         console.error("Eroare la postare: ", error);
@@ -76,10 +76,18 @@ function Entity() {
       });
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   return (
-    <div>
+    <div className="entity-page">
+      <button className="logout-button" onClick={handleLogout}>
+        Logout
+      </button>
       <h2>Entity Dashboard</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="entity-form">
         <input
           type="text"
           name="title"
@@ -126,14 +134,13 @@ function Entity() {
             type="checkbox"
             checked={useRewardItems}
             onChange={() => setUseRewardItems(!useRewardItems)}
-          />
+         />{" "}
           Doresc să adaug premii voluntarilor
         </label>
 
         {useRewardItems && (
-          <div>
+          <div className="reward-items">
             <h3>Reward Items</h3>
-            {}
             <input
               type="text"
               name="name"
@@ -165,7 +172,7 @@ function Entity() {
         <button type="submit">Postează acțiunea</button>
       </form>
 
-      {message && <p>{message}</p>}
+      {message && <p className="message-text">{message}</p>}
     </div>
   );
 }
