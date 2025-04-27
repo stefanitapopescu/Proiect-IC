@@ -9,7 +9,7 @@ public class NewVolunteerActionRequest {
     private String title;
     private String description;
     private String location;
-    private String type; // tipul actiunii
+    private String type; 
     private int requestedVolunteers;
     private LocalDateTime actionDate;
     private List<RewardItemDTO> rewardItems;

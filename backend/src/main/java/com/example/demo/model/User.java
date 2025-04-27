@@ -14,5 +14,5 @@ public class User {
     private String username;
     private String password;
     private String role; 
-    private Integer points = 0; // câmp nou, inițial 0
+    private Integer points = 0; 
 }

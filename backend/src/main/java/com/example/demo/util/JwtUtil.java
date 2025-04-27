@@ -16,7 +16,7 @@ import java.security.Key;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "thisisaverysecretkeythatis32char";// cheie folosita pt criptare
+    private final String SECRET_KEY = "thisisaverysecretkeythatis32char";
 
     public String generateToken(String username) {
         byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);

@@ -29,7 +29,6 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                                  .body("Username already exists.");
         }
-        // Criptează parola înainte de salvare
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepo.save(user);
         return ResponseEntity.ok("User registered as " + user.getRole());
@@ -41,7 +40,6 @@ public class AuthService {
             boolean matches = passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword());
             if (matches) {
                 String token = jwtUtil.generateToken(user.getUsername());
-                // Creează răspunsul JSON cu token și rolul utilizatorului
                 LoginResponse response = new LoginResponse(token, existingUser.get().getRole());
                 return ResponseEntity.ok(response);
             }

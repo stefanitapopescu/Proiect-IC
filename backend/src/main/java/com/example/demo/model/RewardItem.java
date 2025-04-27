@@ -13,6 +13,5 @@ public class RewardItem {
     private String id;
     private String name;
     private int quantity;
-    // Legătură către acțiunea de voluntariat pentru care este oferit acest premiu
     private String volunteerActionId;
 }

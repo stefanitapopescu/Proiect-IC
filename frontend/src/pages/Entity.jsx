@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./Entity.css";
+import './Entity.css';
 
 function Entity() {
   const [formData, setFormData] = useState({
@@ -55,14 +55,11 @@ function Entity() {
     };
 
     if (useRewardItems && finalFormData.rewardItems.length === 0) {
-      setMessage(
-        "Trebuie să adăugați cel puțin un premiu dacă doriți să adăugați premii!"
-      );
+      setMessage("Trebuie să adăugați cel puțin un premiu dacă doriți să adăugați premii!");
       return;
     }
 
-    axios
-      .post("http://localhost:8080/api/entity/post-action", finalFormData)
+    axios.post("http://localhost:8080/api/entity/post-action", finalFormData)
       .then((response) => {
         setMessage(response.data);
       })
@@ -77,70 +74,36 @@ function Entity() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   return (
     <div className="entity-page">
-      <button className="logout-button" onClick={handleLogout}>
-        Logout
-      </button>
+      <button className="logout-button" onClick={handleLogout}>Logout</button>
       <h2>Entity Dashboard</h2>
       <form onSubmit={handleSubmit} className="entity-form">
-        <input
-          type="text"
-          name="title"
-          placeholder="Titlu"
-          onChange={handleChange}
-          required
-        />
-        <textarea
-          name="description"
-          placeholder="Descriere"
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="location"
-          placeholder="Locație"
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="type"
-          placeholder="Tipul acțiunii"
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="number"
-          name="requestedVolunteers"
-          placeholder="Voluntari solicitați"
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="datetime-local"
-          name="actionDate"
-          onChange={handleChange}
-          required
-        />
+        <input type="text" name="title" placeholder="Titlu" onChange={handleChange} required />
+        <textarea name="description" placeholder="Descriere" onChange={handleChange} required />
+        <input type="text" name="location" placeholder="Locație" onChange={handleChange} required />
+        <input type="text" name="type" placeholder="Tipul acțiunii" onChange={handleChange} required />
+        <input type="number" name="requestedVolunteers" placeholder="Voluntari solicitați" onChange={handleChange} required />
+        <input type="datetime-local" name="actionDate" onChange={handleChange} required />
 
-        <label>
-          <input
-            type="checkbox"
-            checked={useRewardItems}
-            onChange={() => setUseRewardItems(!useRewardItems)}
-         />{" "}
-          Doresc să adaug premii voluntarilor
-        </label>
+        <div className="form-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={useRewardItems}
+              onChange={() => setUseRewardItems(!useRewardItems)}
+            />
+            Doresc să adaug premii voluntarilor
+          </label>
+        </div>
 
         {useRewardItems && (
           <div className="reward-items">
-            <h3>Reward Items</h3>
+            <h3>Articole drept recomponse</h3>
             <input
               type="text"
               name="name"
@@ -155,15 +118,11 @@ function Entity() {
               value={rewardItem.quantity}
               onChange={handleRewardChange}
             />
-            <button type="button" onClick={addRewardItem}>
-              Adaugă obiect
-            </button>
+            <button type="button" onClick={addRewardItem}>Adaugă obiect</button>
 
             <ul>
               {formData.rewardItems.map((ri, index) => (
-                <li key={index}>
-                  {ri.name} - {ri.quantity}
-                </li>
+                <li key={index}>{ri.name} - {ri.quantity}</li>
               ))}
             </ul>
           </div>

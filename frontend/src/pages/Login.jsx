@@ -18,17 +18,10 @@ function Login() {
         "http://localhost:8080/api/auth/login",
         formData
       );
-      // Se presupune că răspunsul este un obiect JSON cu token și role
       const { token, role } = res.data;
-
-      // Stochează tokenul în localStorage
       localStorage.setItem("token", token);
-      // Setează header-ul Authorization pentru toate cererile Axios
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-
       alert("Login successful!");
-
-      // Redirecționează în funcție de rol
       if (role === "volunteer") {
         navigate("/volunteer");
       } else if (role === "entity") {
