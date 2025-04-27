@@ -4,6 +4,8 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "volunteerActions")
 @Data
@@ -19,5 +21,6 @@ public class VolunteerAction {
     private int requestedVolunteers;
     private int allocatedVolunteers;
     private LocalDateTime actionDate;
-    private String postedBy; // username-ul beneficiarului
+    private String postedBy;
+    private List<String> joinedUserIds = new ArrayList<>();
 }

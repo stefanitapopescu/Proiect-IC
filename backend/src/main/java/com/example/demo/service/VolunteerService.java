@@ -20,21 +20,26 @@ public class VolunteerService {
     @Autowired
     private UserRepository userRepository;
 
-    public void signupForAction(VolunteerSignupRequest request) {
-        Optional<VolunteerAction> actionOptional = volunteerActionRepository.findById(request.getVolunteerActionId());
-        if (actionOptional.isEmpty()) {
+    public void signupForAction(VolunteerSignupRequest request, String username) {
+        Optional<VolunteerAction> actionOpt = volunteerActionRepository.findById(request.getVolunteerActionId());
+        if (actionOpt.isEmpty()) {
             throw new IllegalArgumentException("ID-ul acțiunii de voluntariat este invalid.");
         }
-        VolunteerAction action = actionOptional.get();
+
+        VolunteerAction action = actionOpt.get();
+
+        if (action.getJoinedUserIds().contains(username)) {
+            throw new IllegalStateException("V-ați înscris deja la această acțiune.");
+        }
 
         if (action.getAllocatedVolunteers() >= action.getRequestedVolunteers()) {
             throw new IllegalStateException("Nu mai sunt locuri disponibile pentru această acțiune.");
         }
 
+        action.getJoinedUserIds().add(username);
         action.setAllocatedVolunteers(action.getAllocatedVolunteers() + 1);
         volunteerActionRepository.save(action);
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isPresent()) {
             User volunteer = userOptional.get();
@@ -43,7 +48,7 @@ public class VolunteerService {
             userRepository.save(volunteer);
         }
     }
-    
+
     public Iterable<VolunteerAction> getAllActions(String sortBy) {
         return volunteerActionRepository.findAll();
     }

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Login() {
-  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -13,24 +14,27 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/login', formData);
+      const res = await axios.post(
+        "http://localhost:8080/api/auth/login",
+        formData
+      );
       // Se presupune că răspunsul este un obiect JSON cu token și role
       const { token, role } = res.data;
-      
+
       // Stochează tokenul în localStorage
       localStorage.setItem("token", token);
       // Setează header-ul Authorization pentru toate cererile Axios
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-      
+
       alert("Login successful!");
 
       // Redirecționează în funcție de rol
-      if (role === 'volunteer') {
-         navigate("/volunteer");
-      } else if (role === 'entity') {
-         navigate("/entity");
+      if (role === "volunteer") {
+        navigate("/volunteer");
+      } else if (role === "entity") {
+        navigate("/entity");
       } else {
-         navigate("/");
+        navigate("/");
       }
     } catch (err) {
       alert("Login failed: " + err.response.data);
@@ -41,13 +45,29 @@ function Login() {
     <div className="container">
       <h2>Welcome!</h2>
       <form onSubmit={handleSubmit}>
-        <input name="username" placeholder="Username" onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+        <input
+          name="username"
+          placeholder="Username"
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+          required
+        />
         <button type="submit">Login</button>
       </form>
-      <p>No account yet? <span onClick={() => navigate('/signup')}>Sign up</span></p>
+      <p>
+        No account yet?{" "}
+        <Link to="/signup" style={{ color: "green" }}>
+          Sign up
+        </Link>
+      </p>
     </div>
   );
 }
 
-export default Login;
+export default Login;   

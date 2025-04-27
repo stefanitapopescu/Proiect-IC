@@ -5,6 +5,7 @@ import com.example.demo.model.VolunteerAction;
 import com.example.demo.service.VolunteerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,12 +23,9 @@ public class VolunteerController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signupForAction(@RequestBody VolunteerSignupRequest request) {
-        try {
-            volunteerService.signupForAction(request);
-            return ResponseEntity.ok("Înscrierea a fost realizată cu succes!");
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+     public String signupForAction(@RequestBody VolunteerSignupRequest request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        volunteerService.signupForAction(request, username);
+        return "Înscriere realizată cu succes!";
     }
 }

@@ -16,12 +16,12 @@ import java.security.Key;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "thisisaverysecretkeythatis32char";//cheie folosita pt criptare
+    private final String SECRET_KEY = "thisisaverysecretkeythatis32char";// cheie folosita pt criptare
 
     public String generateToken(String username) {
         byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
         Key key = Keys.hmacShaKeyFor(keyBytes);
-        
+
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -29,11 +29,7 @@ public class JwtUtil {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
-    
-    
-    
-    
-    
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -45,12 +41,12 @@ public class JwtUtil {
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
         Key key = Keys.hmacShaKeyFor(keyBytes);
-    
+
         Claims claims = Jwts.parserBuilder()
-                            .setSigningKey(key)
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody();
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
         return claimsResolver.apply(claims);
     }
 

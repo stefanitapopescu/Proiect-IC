@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 function Entity() {
   const [formData, setFormData] = useState({
@@ -9,18 +9,15 @@ function Entity() {
     type: "",
     requestedVolunteers: 0,
     actionDate: "",
-    rewardItems: []
+    rewardItems: [],
   });
 
- 
   const [rewardItem, setRewardItem] = useState({ name: "", quantity: 0 });
 
-  
   const [useRewardItems, setUseRewardItems] = useState(false);
 
   const [message, setMessage] = useState("");
 
- 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -30,10 +27,9 @@ function Entity() {
   };
 
   const addRewardItem = () => {
-   
     const itemToAdd = {
       ...rewardItem,
-      quantity: Number(rewardItem.quantity)
+      quantity: Number(rewardItem.quantity),
     };
 
     if (!itemToAdd.name.trim() || itemToAdd.quantity <= 0) {
@@ -43,7 +39,7 @@ function Entity() {
 
     setFormData({
       ...formData,
-      rewardItems: [...formData.rewardItems, itemToAdd]
+      rewardItems: [...formData.rewardItems, itemToAdd],
     });
     setRewardItem({ name: "", quantity: 0 });
   };
@@ -55,25 +51,28 @@ function Entity() {
     const finalFormData = {
       ...formData,
       rewardItems: useRewardItems ? formData.rewardItems : [],
-      requestedVolunteers: Number(formData.requestedVolunteers)
+      requestedVolunteers: Number(formData.requestedVolunteers),
     };
 
     if (useRewardItems && finalFormData.rewardItems.length === 0) {
-      setMessage("Trebuie să adăugați cel puțin un premiu dacă doriți să adăugați premii!");
+      setMessage(
+        "Trebuie să adăugați cel puțin un premiu dacă doriți să adăugați premii!"
+      );
       return;
     }
 
-    axios.post("http://localhost:8080/api/entity/post-action", finalFormData)
+    axios
+      .post("http://localhost:8080/api/entity/post-action", finalFormData)
       .then((response) => {
-          setMessage(response.data);  // "Acțiunea de voluntariat a fost postată cu succes!"
+        setMessage(response.data); // "Acțiunea de voluntariat a fost postată cu succes!"
       })
       .catch((error) => {
-          console.error("Eroare la postare: ", error);
-          if (error.response && error.response.data) {
-            setMessage(error.response.data);
-          } else {
-            setMessage("Eroare la postarea acțiunii");
-          }
+        console.error("Eroare la postare: ", error);
+        if (error.response && error.response.data) {
+          setMessage(error.response.data);
+        } else {
+          setMessage("Eroare la postarea acțiunii");
+        }
       });
   };
 

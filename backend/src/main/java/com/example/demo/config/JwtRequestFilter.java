@@ -20,7 +20,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
-    
+
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
@@ -28,27 +28,24 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-                
-   
-    logger.info("getRequestURI: " + request.getRequestURI());
-    logger.info("getServletPath: " + request.getServletPath());
+        logger.info("getRequestURI: " + request.getRequestURI());
+        logger.info("getServletPath: " + request.getServletPath());
         String path = request.getServletPath();
-    
-      
+
         if (path.startsWith("/api/auth")) {
             chain.doFilter(request, response);
             return;
         }
-    
+
         final String authorizationHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
-    
+
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             username = jwtUtil.extractUsername(jwt);
         }
-    
+
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = userDetailsService.loadUserByUsername(username);
             if (jwtUtil.validateToken(jwt, userDetails)) {
@@ -58,8 +55,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-    
+
         chain.doFilter(request, response);
     }
-    
+
 }
