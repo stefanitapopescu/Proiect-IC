@@ -8,6 +8,7 @@ import Volunteer from "./pages/Volunteer";
 import Entity from "./pages/Entity";
 import Shop from "./pages/Shop"
 import VolunteerHome from "./pages/VolunteerHome";
+import Wallet from './pages/Wallet';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/volunteer" element={<Volunteer />} />
         <Route path="/entity" element={<Entity />} />
+        <Route path="/wallet" element={<Wallet />} />
       </Routes>
     </Router>
   );
