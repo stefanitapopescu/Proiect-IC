@@ -5,16 +5,6 @@ import "./Home.css";
 
 function Home() {
   const navigate = useNavigate();
-  useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/test")
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, []);
 
   return (
     <div className="home-container">
