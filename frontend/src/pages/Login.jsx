@@ -23,7 +23,7 @@ function Login() {
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
       alert("Login successful!");
       if (role === "volunteer") {
-        navigate("/volunteer");
+        navigate("/volunteer-home");
       } else if (role === "entity") {
         navigate("/entity");
       } else {
