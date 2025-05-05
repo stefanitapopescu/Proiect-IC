@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.server.ResponseStatusException;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class EntityService {
@@ -44,9 +45,17 @@ public class EntityService {
         action.setDescription(request.getDescription());
         action.setLocation(request.getLocation());
         action.setType(request.getType());
+        action.setCategory(request.getCategory());
         action.setRequestedVolunteers(request.getRequestedVolunteers());
         action.setAllocatedVolunteers(0);
         action.setActionDate(request.getActionDate());
+        
+        if (request.getActionDate() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+            String formattedDate = request.getActionDate().format(formatter);
+            action.setDate(formattedDate);
+        }
+        
         action.setPostedBy(username);
 
         VolunteerAction savedAction = volunteerActionRepository.save(action);

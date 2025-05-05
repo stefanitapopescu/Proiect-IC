@@ -12,6 +12,9 @@ public class RewardItem {
     @Id
     private String id;
     private String name;
+    private String description;
     private int quantity;
-    private String volunteerActionId;
+    private Integer pointCost; 
+    private String imageUrl; 
+    private String volunteerActionId; 
 }

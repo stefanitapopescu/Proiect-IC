@@ -10,6 +10,7 @@ public class NewVolunteerActionRequest {
     private String description;
     private String location;
     private String type; 
+    private String category;
     private int requestedVolunteers;
     private LocalDateTime actionDate;
     private List<RewardItemDTO> rewardItems;

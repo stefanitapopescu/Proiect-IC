@@ -14,8 +14,11 @@ public class User {
     @Id
     private String id;
     private String username;
+    private String email;
+    private String name;
     private String password;
     private String role; 
+    private String userType; 
     private Integer points = 0; 
     private List<String> boughtRewardIds = new ArrayList<>();
 }

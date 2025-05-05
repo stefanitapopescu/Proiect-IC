@@ -30,9 +30,12 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())  
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/test", "/error").permitAll()
+                .requestMatchers("/api/auth/**", "/api/test", "/api/auth-debug", "/error").permitAll()
+                .requestMatchers("/api/volunteer/**").hasAnyAuthority("VOLUNTEER", "volunteer")
+                .requestMatchers("/api/entity/**").hasAnyAuthority("ENTITY", "entity")
                 .anyRequest().authenticated()
             )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     
         return http.build();

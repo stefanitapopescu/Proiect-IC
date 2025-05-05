@@ -4,12 +4,16 @@ import com.example.demo.model.RewardItem;
 import com.example.demo.service.ShopService;
 import com.example.demo.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/shop")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ShopController {
 
     @Autowired
@@ -30,8 +34,13 @@ public class ShopController {
     }
 
     @PostMapping("/buy/{rewardId}")
-    public String buyReward(@PathVariable String rewardId, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, String>> buyReward(@PathVariable String rewardId, @RequestHeader("Authorization") String token) {
         String username = jwtUtil.extractUsername(token.substring(7));
-        return shopService.buyReward(rewardId, username);
+        String message = shopService.buyReward(rewardId, username);
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("message", message);
+        
+        return ResponseEntity.ok(response);
     }
 }

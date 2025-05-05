@@ -8,11 +8,18 @@ import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class VolunteerService {
+
+    private static final Logger logger = LoggerFactory.getLogger(VolunteerService.class);
 
     @Autowired
     private VolunteerActionRepository volunteerActionRepository;
@@ -50,6 +57,25 @@ public class VolunteerService {
     }
 
     public Iterable<VolunteerAction> getAllActions(String sortBy) {
-        return volunteerActionRepository.findAll();
+        List<VolunteerAction> actions = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        
+        logger.info("Fetching all volunteer actions");
+        
+        volunteerActionRepository.findAll().forEach(action -> {
+            logger.info("Action ID: {}, Title: {}, Category: {}", 
+                    action.getId(), action.getTitle(), action.getCategory());
+            
+            if ((action.getDate() == null || action.getDate().isEmpty()) && action.getActionDate() != null) {
+                String formattedDate = action.getActionDate().format(formatter);
+                action.setDate(formattedDate);
+                volunteerActionRepository.save(action); 
+            }
+            
+            actions.add(action);
+        });
+        
+        logger.info("Returned {} actions", actions.size());
+        return actions;
     }
 }

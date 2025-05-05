@@ -18,9 +18,12 @@ public class VolunteerAction {
     private String description;
     private String location;
     private String type;
+    private String category;
+    private String imageUrl;
     private int requestedVolunteers;
     private int allocatedVolunteers;
     private LocalDateTime actionDate;
+    private String date;
     private String postedBy;
     private List<String> joinedUserIds = new ArrayList<>();
 }
