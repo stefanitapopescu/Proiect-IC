@@ -65,6 +65,8 @@ public class EntityService {
             rewardItem.setName(rewardDTO.getName());
             rewardItem.setQuantity(rewardDTO.getQuantity());
             rewardItem.setVolunteerActionId(savedAction.getId());
+            // Adăugat copia tag-ului din DTO
+            rewardItem.setTag(rewardDTO.getTag());
             rewardItemRepository.save(rewardItem);
         });
     }

@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.RewardItem;
+import com.example.demo.dto.RewardItemDTO;
 import com.example.demo.service.ShopService;
 import com.example.demo.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class ShopController {
     private JwtUtil jwtUtil;
 
     @GetMapping("/rewards")
-    public List<RewardItem> getAllRewards() {
+    public List<RewardItemDTO> getAllRewards() {
         return shopService.getAllRewards();
     }
 

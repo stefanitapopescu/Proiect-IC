@@ -17,4 +17,5 @@ public class RewardItem {
     private Integer pointCost; 
     private String imageUrl; 
     private String volunteerActionId; 
+    private String tag; // ex: "alimente", "electrocasnice", "jocuri"
 }
