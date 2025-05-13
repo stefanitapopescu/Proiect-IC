@@ -1,14 +1,13 @@
+// src/components/Shop.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
-import Card from '../components/Card';
 import './Shop.css';
 
 function Shop() {
   const [rewards, setRewards] = useState([]);
-  const [boughtRewards, setBoughtRewards] = useState([]);
-  const [message, setMessage] = useState("");
   const [points, setPoints] = useState(0);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,71 +23,74 @@ function Shop() {
   const fetchRewards = () => {
     const token = localStorage.getItem('token');
     axios.get('http://localhost:8080/api/shop/rewards', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     })
-      .then(response => {
-        setRewards(response.data);
-      })
-      .catch(error => {
-        console.error("Eroare la încărcarea reward-urilor:", error);
-        if (error.response && error.response.status === 403) {
-          navigate('/login');
-        }
-      });
+    .then(response => setRewards(response.data))
+    .catch(error => {
+      console.error("Eroare la încărcarea reward-urilor:", error);
+      if (error.response && error.response.status === 403) {
+        navigate('/login');
+      }
+    });
   };
 
   const fetchUserPoints = () => {
     const token = localStorage.getItem('token');
-    if (token) {
-      axios.get('http://localhost:8080/api/volunteer/points', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      .then(response => {
-        setPoints(response.data);
-      })
-      .catch(error => {
-        console.error("Eroare la încărcarea punctelor:", error);
-        if (error.response && error.response.status === 403) {
-          navigate('/login');
-        }
-      });
-    }
+    if (!token) return;
+    axios.get('http://localhost:8080/api/volunteer/points', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(response => setPoints(response.data))
+    .catch(error => {
+      console.error("Eroare la încărcarea punctelor:", error);
+      if (error.response && error.response.status === 403) {
+        navigate('/login');
+      }
+    });
   };
 
-  const handleBuy = (rewardId) => {
+  const handleBuy = (rewardId, pointCost) => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
       return;
     }
-    
+    if (points < pointCost) {
+      setMessage("Nu ai suficiente puncte pentru acest reward!");
+      return;
+    }
+
     axios.post(`http://localhost:8080/api/shop/buy/${rewardId}`, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     })
     .then(response => {
-      setMessage(response.data.message || "Achiziție reușită!");
-      setBoughtRewards([...boughtRewards, rewardId]);
-      fetchRewards(); 
+      // extragem textul din obiectul { message: "..."}
+      const msg = response.data?.message || response.data;
+      setMessage(msg);
+      fetchRewards();
       fetchUserPoints();
     })
     .catch(error => {
       console.error("Eroare la cumpărare:", error);
       if (error.response) {
-        if (error.response.status === 403) {
+        // dacă serverul trimite { message: "..." }
+        if (error.response.data?.message) {
+          setMessage(error.response.data.message);
+        } else if (error.response.status === 403) {
           navigate('/login');
-        } else if (error.response.data) {
-          setMessage(error.response.data.message || "Eroare necunoscută la cumpărare");
+        } else {
+          setMessage("Eroare necunoscută la cumpărare");
         }
       } else {
         setMessage("Eroare necunoscută la cumpărare");
       }
     });
+  };
+
+  const getButtonText = (reward) => {
+    if (reward.quantity <= 0) return "Sold Out";
+    if (points < reward.pointCost) return "Puncte insuficiente";
+    return "Cumpără";
   };
 
   return (
@@ -101,29 +103,46 @@ function Shop() {
             <span className="points-value">{points}</span>
           </div>
         </header>
-        
+
         {message && (
           <div className="global-message info">
             {message}
           </div>
         )}
-        
-        <div className="grid-layout rewards-grid">
+
+        <div className="rewards-grid">
           {rewards.length > 0 ? (
             rewards.map((reward) => (
-              <Card
-                key={reward.id}
-                title={reward.name}
-                description={reward.description || "Recompensă specială pentru voluntari dedicați."}
-                stats={[
-                  { label: "Cantitate disponibilă", value: reward.quantity },
-                  { label: "Puncte necesare", value: reward.pointCost || "N/A" }
-                ]}
-                buttonText={boughtRewards.includes(reward.id) ? "Deja cumpărat" : "Cumpără"}
-                buttonAction={() => handleBuy(reward.id)}
-                buttonDisabled={boughtRewards.includes(reward.id) || reward.quantity <= 0 || (reward.pointCost && points < reward.pointCost)}
-                imageUrl={reward.imageUrl || null}
-              />
+              <div key={reward.id} className="reward-card">
+                <h3>{reward.name}</h3>
+                <p>{reward.description}</p>
+                <div className="reward-tags">
+                  <span className={`reward-tag tag-${reward.tag}`}>
+                    {reward.tag}
+                  </span>
+                </div>
+                <div className="reward-details">
+                  <div className="reward-cost">
+                    Cost: {reward.pointCost} puncte
+                  </div>
+                  <div className="reward-stock">
+                    {reward.quantity > 0
+                      ? `În stoc: ${reward.quantity}`
+                      : "Stoc epuizat"}
+                  </div>
+                </div>
+                <button
+                  className={`buy-button ${
+                    reward.quantity <= 0 || points < reward.pointCost
+                      ? 'disabled'
+                      : ''
+                  }`}
+                  disabled={reward.quantity <= 0 || points < reward.pointCost}
+                  onClick={() => handleBuy(reward.id, reward.pointCost)}
+                >
+                  {getButtonText(reward)}
+                </button>
+              </div>
             ))
           ) : (
             <div className="no-rewards-message">

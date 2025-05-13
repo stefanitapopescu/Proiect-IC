@@ -14,7 +14,7 @@ function Entity() {
     rewardItems: [],
   });
 
-  const [rewardItem, setRewardItem] = useState({ name: "", quantity: 0 });
+  const [rewardItem, setRewardItem] = useState({ name: "", quantity: 0, tag: "" });
   const [useRewardItems, setUseRewardItems] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
@@ -34,8 +34,8 @@ function Entity() {
       quantity: Number(rewardItem.quantity),
     };
 
-    if (!itemToAdd.name.trim() || itemToAdd.quantity <= 0) {
-      setMessage("Completați numele obiectului și o cantitate mai mare decât 0!");
+    if (!itemToAdd.name.trim() || itemToAdd.quantity <= 0 || !itemToAdd.tag) {
+      setMessage("Completați numele, tag-ul și o cantitate mai mare decât 0!");
       setMessageType("error");
       return;
     }
@@ -44,16 +44,16 @@ function Entity() {
       ...formData,
       rewardItems: [...formData.rewardItems, itemToAdd],
     });
-    setRewardItem({ name: "", quantity: 0 });
+    setRewardItem({ name: "", quantity: 0, tag: "" });
     setMessage("Obiect adăugat cu succes!");
     setMessageType("success");
-    
+
     setTimeout(() => {
       setMessage("");
       setMessageType("");
     }, 3000);
   };
-  
+
   const removeRewardItem = (index) => {
     const updatedItems = [...formData.rewardItems];
     updatedItems.splice(index, 1);
@@ -79,7 +79,7 @@ function Entity() {
     }
 
     const token = localStorage.getItem('token');
-    
+
     axios.post("http://localhost:8080/api/entity/post-action", finalFormData, {
       headers: {
         Authorization: `Bearer ${token}`
@@ -131,65 +131,65 @@ function Entity() {
           <h1>Panou Organizație</h1>
           <button className="logout-button" onClick={handleLogout}>Deconectare</button>
         </header>
-        
+
         <div className="entity-form-container">
           <div className="form-header">
             <h2>Creează o nouă acțiune de voluntariat</h2>
             <p>Completați detaliile pentru a publica o nouă oportunitate</p>
           </div>
-          
+
           {message && (
             <div className={`message-box ${messageType}`}>
               {message}
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="entity-form">
             <div className="form-group">
               <label htmlFor="title">Titlu acțiune</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 id="title"
-                name="title" 
+                name="title"
                 value={formData.title}
-                placeholder="Titlul acțiunii de voluntariat" 
-                onChange={handleChange} 
-                required 
+                placeholder="Titlul acțiunii de voluntariat"
+                onChange={handleChange}
+                required
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="description">Descriere</label>
-              <textarea 
+              <textarea
                 id="description"
-                name="description" 
+                name="description"
                 value={formData.description}
-                placeholder="Descrieți acțiunea în detaliu" 
-                onChange={handleChange} 
-                required 
+                placeholder="Descrieți acțiunea în detaliu"
+                onChange={handleChange}
+                required
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="location">Locație</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 id="location"
-                name="location" 
+                name="location"
                 value={formData.location}
-                placeholder="Adresa sau locația exactă" 
-                onChange={handleChange} 
-                required 
+                placeholder="Adresa sau locația exactă"
+                onChange={handleChange}
+                required
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="category">Categorie</label>
-              <select 
+              <select
                 id="category"
-                name="category" 
+                name="category"
                 value={formData.category}
-                onChange={handleChange} 
+                onChange={handleChange}
                 required
               >
                 <option value="">Selectați categoria</option>
@@ -198,31 +198,31 @@ function Entity() {
                 ))}
               </select>
             </div>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="requestedVolunteers">Voluntari necesari</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   id="requestedVolunteers"
-                  name="requestedVolunteers" 
+                  name="requestedVolunteers"
                   min="1"
                   value={formData.requestedVolunteers}
-                  placeholder="Număr de voluntari" 
-                  onChange={handleChange} 
-                  required 
+                  placeholder="Număr de voluntari"
+                  onChange={handleChange}
+                  required
                 />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="actionDate">Data acțiunii</label>
-                <input 
-                  type="datetime-local" 
+                <input
+                  type="datetime-local"
                   id="actionDate"
-                  name="actionDate" 
+                  name="actionDate"
                   value={formData.actionDate}
-                  onChange={handleChange} 
-                  required 
+                  onChange={handleChange}
+                  required
                 />
               </div>
             </div>
@@ -241,7 +241,7 @@ function Entity() {
             {useRewardItems && (
               <div className="reward-items-section">
                 <h3>Recompense pentru voluntari</h3>
-                
+
                 <div className="reward-form">
                   <div className="form-row">
                     <div className="form-group">
@@ -255,7 +255,7 @@ function Entity() {
                         onChange={handleRewardChange}
                       />
                     </div>
-                    
+
                     <div className="form-group">
                       <label htmlFor="rewardQuantity">Cantitate</label>
                       <input
@@ -268,10 +268,29 @@ function Entity() {
                         onChange={handleRewardChange}
                       />
                     </div>
-                    
-                    <button 
-                      type="button" 
-                      className="add-reward-btn" 
+
+                    <div className="form-group">
+                      <label htmlFor="rewardTag">Tag</label>
+                      <select
+                        id="rewardTag"
+                        name="tag"
+                        value={rewardItem.tag}
+                        onChange={handleRewardChange}
+                        required
+                      >
+                        <option value="">Selectează tag</option>
+                        <option value="alimente">alimente</option>
+                        <option value="electrocasnice">electrocasnice</option>
+                        <option value="jocuri">jocuri</option>
+                        <option value="vouchere">vouchere</option>
+                        <option value="accesorii">accesorii</option>
+                        <option value="haine">haine</option>
+                      </select>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="add-reward-btn"
                       onClick={addRewardItem}
                     >
                       Adaugă
@@ -286,9 +305,9 @@ function Entity() {
                       {formData.rewardItems.map((item, index) => (
                         <li key={index}>
                           <span>{item.name} - {item.quantity} buc.</span>
-                          <button 
-                            type="button" 
-                            className="remove-reward-btn" 
+                          <button
+                            type="button"
+                            className="remove-reward-btn"
                             onClick={() => removeRewardItem(index)}
                           >
                             ×

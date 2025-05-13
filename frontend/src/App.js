@@ -8,9 +8,10 @@ import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import Volunteer from "./pages/Volunteer";
 import Entity from "./pages/Entity";
-import Shop from "./pages/Shop"
+import Shop from "./pages/Shop";
 import VolunteerHome from "./pages/VolunteerHome";
 import Wallet from './pages/Wallet';
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./styles.css";
 
 function App() {
@@ -23,11 +24,48 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/volunteer-home" element={<VolunteerHome />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/volunteer" element={<Volunteer />} />
-            <Route path="/entity" element={<Entity />} />
-            <Route path="/wallet" element={<Wallet />} />
+
+            {/* RUTE PROTEJATE */}
+            <Route
+              path="/volunteer-home"
+              element={
+                <ProtectedRoute allowedRoles={['volunteer']}>
+                  <VolunteerHome />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/shop"
+              element={
+                <ProtectedRoute allowedRoles={['volunteer']}>
+                  <Shop />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/volunteer"
+              element={
+                <ProtectedRoute allowedRoles={['volunteer']}>
+                  <Volunteer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/entity"
+              element={
+                <ProtectedRoute allowedRoles={['entity']}>
+                  <Entity />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/wallet"
+              element={
+                <ProtectedRoute allowedRoles={['volunteer']}>
+                  <Wallet />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
         <Footer />

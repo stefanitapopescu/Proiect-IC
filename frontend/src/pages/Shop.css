@@ -1,3 +1,4 @@
+
 .shop-page {
   min-height: calc(100vh - 160px);
   padding: 30px 0;
@@ -39,87 +40,126 @@
 }
 
 .rewards-grid {
-  margin-top: 30px;
-}
-
-.no-rewards-message {
-  text-align: center;
-  padding: 60px 0;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  grid-column: 1 / -1;
-}
-
-.no-rewards-message p {
-  font-size: 1.2rem;
-  color: #666;
-}
-
-@media screen and (max-width: 768px) {
-  .shop-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-  
-  .shop-header h1 {
-    font-size: 1.6rem;
-  }
-}
-
-.rewards-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
   margin-top: 30px;
 }
 
 .reward-card {
   background: white;
-  padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  width: 220px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
-.reward-card button {
-  margin-top: 10px;
-  padding: 10px 15px;
-  background-color: #4CAF50;
+.reward-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.reward-card h3 {
+  font-size: 1.4rem;
+  color: #2c3e50;
+  margin: 0 0 10px 0;
+}
+
+.reward-card p {
+  color: #666;
+  margin-bottom: 15px;
+  flex-grow: 1;
+}
+
+.reward-tags {
+  margin-bottom: 15px;
+}
+
+.reward-tag {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
   color: white;
+  background-color: #3498db;
+}
+
+.tag-alimente {
+  background-color: #2ecc71;
+}
+
+.tag-electrocasnice {
+  background-color: #e74c3c;
+}
+
+.tag-jocuri {
+  background-color: #9b59b6;
+}
+
+.tag-vouchere {
+  background-color: #f1c40f;
+}
+
+.tag-accesorii {
+  background-color: #1abc9c;
+}
+
+.tag-haine {
+  background-color: #e67e22;
+}
+
+.reward-details {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.reward-cost {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.reward-stock {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.buy-button {
+  width: 100%;
+  padding: 12px;
   border: none;
   border-radius: 8px;
-  cursor: pointer;
   font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #3498db;
+  color: white;
 }
 
-.reward-card button:disabled {
-  background-color: #ccc;
+.buy-button:hover:not(.disabled) {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+.buy-button.disabled {
+  background-color: #bdc3c7;
   cursor: not-allowed;
+  transform: none;
 }
 
-.shop-message {
-  margin-top: 20px;
-  font-weight: bold;
-  color: #4CAF50;
-}
-
-.logout-button {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 1rem;
+.global-message {
+  padding: 15px;
   border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
 }
 
-.logout-button:hover {
-  background-color: #d32f2f;
-}
+
