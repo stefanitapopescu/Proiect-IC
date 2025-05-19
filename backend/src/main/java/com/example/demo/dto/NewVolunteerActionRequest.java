@@ -9,6 +9,8 @@ public class NewVolunteerActionRequest {
     private String title;
     private String description;
     private String location;
+    private Double locationLat;
+    private Double locationLng;
     private String type; 
     private String category;
     private int requestedVolunteers;

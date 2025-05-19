@@ -1,5 +1,5 @@
 import "./axiosConfig";
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -12,9 +12,23 @@ import Shop from "./pages/Shop";
 import VolunteerHome from "./pages/VolunteerHome";
 import Wallet from './pages/Wallet';
 import ProtectedRoute from "./components/ProtectedRoute";
+import ResetPassword from "./pages/ResetPassword";
+import ResetPasswordConfirm from "./pages/ResetPasswordConfirm";
 import "./styles.css";
+import Cookies from 'js-cookie';
 
 function App() {
+  useEffect(() => {
+    const cookieToken = Cookies.get('token');
+    if (cookieToken && !localStorage.getItem('token')) {
+      localStorage.setItem('token', cookieToken);
+    }
+    const cookieUserType = Cookies.get('userType');
+    if (cookieUserType && !localStorage.getItem('userType')) {
+      localStorage.setItem('userType', cookieUserType);
+    }
+  }, []);
+
   return (
     <Router>
       <div className="app-container">
@@ -24,6 +38,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/reset-password/confirm" element={<ResetPasswordConfirm />} />
 
             {/* RUTE PROTEJATE */}
             <Route

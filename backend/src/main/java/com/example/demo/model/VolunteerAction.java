@@ -17,6 +17,8 @@ public class VolunteerAction {
     private String title;
     private String description;
     private String location;
+    private Double locationLat;
+    private Double locationLng;
     private String type;
     private String category;
     private String imageUrl;

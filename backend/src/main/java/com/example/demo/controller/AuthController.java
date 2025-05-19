@@ -56,4 +56,17 @@ public class AuthController {
     
     return ResponseEntity.notFound().build();
   }
+
+  @PostMapping("/reset-password-request")
+  public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> body) {
+    String email = body.get("email");
+    return authService.requestPasswordReset(email);
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+    String token = body.get("token");
+    String newPassword = body.get("newPassword");
+    return authService.resetPassword(token, newPassword);
+  }
 }

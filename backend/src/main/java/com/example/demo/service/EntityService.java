@@ -44,6 +44,8 @@ public class EntityService {
         action.setTitle(request.getTitle());
         action.setDescription(request.getDescription());
         action.setLocation(request.getLocation());
+        action.setLocationLat(request.getLocationLat());
+        action.setLocationLng(request.getLocationLng());
         action.setType(request.getType());
         action.setCategory(request.getCategory());
         action.setRequestedVolunteers(request.getRequestedVolunteers());

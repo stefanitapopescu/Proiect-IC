@@ -11,8 +11,15 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.LoginResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.example.demo.model.PasswordResetToken;
+import com.example.demo.repository.PasswordResetTokenRepository;
+import java.util.Date;
+import java.util.Map;
 
 import java.util.Optional;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class AuthService {
@@ -27,6 +34,15 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepo;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String fromEmail;
 
     public ResponseEntity<?> signup(User user) {
         logger.debug("Signup attempt for username: {}, email: {}, userType: {}, role: {}", 
@@ -117,5 +133,46 @@ public class AuthService {
         
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                              .body("Invalid credentials.");
+    }
+
+    public ResponseEntity<?> requestPasswordReset(String email) {
+        Optional<User> userOpt = userRepo.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.ok("Dacă adresa există, vei primi un email cu link de resetare.");
+        }
+        User user = userOpt.get();
+        passwordResetTokenRepo.deleteByUserId(user.getId());
+        String token = java.util.UUID.randomUUID().toString();
+        Date expiry = new Date(System.currentTimeMillis() + 1000 * 60 * 60); // 1 oră
+        PasswordResetToken resetToken = new PasswordResetToken(null, user.getId(), token, expiry);
+        passwordResetTokenRepo.save(resetToken);
+        String link = "http://localhost:3000/reset-password/confirm?token=" + token;
+
+        // Trimite email real
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setFrom(fromEmail);
+        message.setSubject("Resetare parolă VolunteerHub");
+        message.setText("Salut! Pentru a-ți reseta parola, accesează linkul:\n" + link + "\n\nDacă nu ai cerut resetarea parolei, ignoră acest email.");
+        mailSender.send(message);
+
+        return ResponseEntity.ok("Dacă adresa există, vei primi un email cu link de resetare.");
+    }
+
+    public ResponseEntity<?> resetPassword(String token, String newPassword) {
+        Optional<PasswordResetToken> tokenOpt = passwordResetTokenRepo.findByToken(token);
+        if (tokenOpt.isEmpty() || tokenOpt.get().getExpiryDate().before(new Date())) {
+            return ResponseEntity.badRequest().body("Token invalid sau expirat.");
+        }
+        PasswordResetToken resetToken = tokenOpt.get();
+        Optional<User> userOpt = userRepo.findById(resetToken.getUserId());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Utilizator inexistent.");
+        }
+        User user = userOpt.get();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepo.save(user);
+        passwordResetTokenRepo.deleteByUserId(user.getId());
+        return ResponseEntity.ok("Parola a fost resetată cu succes.");
     }
 }    
