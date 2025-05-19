@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
+import Cookies from 'js-cookie';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -10,10 +11,10 @@ const Navbar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || Cookies.get('token');
+    const storedUserType = localStorage.getItem('userType') || Cookies.get('userType');
     if (token) {
       setIsLoggedIn(true);
-      const storedUserType = localStorage.getItem('userType');
       setUserType(storedUserType);
     } else {
       setIsLoggedIn(false);
@@ -24,6 +25,8 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userType');
+    Cookies.remove('token');
+    Cookies.remove('userType');
     setIsLoggedIn(false);
     setUserType(null);
     navigate('/login');
@@ -39,18 +42,18 @@ const Navbar = () => {
         <Link to="/" className="navbar-logo">
           <span className="logo-text">VolunteerHub</span>
         </Link>
-        
+
         <div className="menu-icon" onClick={toggleMenu}>
           <i className={menuOpen ? 'fas fa-times' : 'fas fa-bars'} />
         </div>
-        
+
         <ul className={menuOpen ? 'nav-menu active' : 'nav-menu'}>
           <li className="nav-item">
             <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>
               Home
             </Link>
           </li>
-          
+
           {isLoggedIn ? (
             <>
               {userType === 'volunteer' && (
@@ -72,7 +75,7 @@ const Navbar = () => {
                   </li>
                 </>
               )}
-              
+
               {userType === 'entity' && (
                 <li className="nav-item">
                   <Link to="/entity" className="nav-link" onClick={() => setMenuOpen(false)}>
@@ -80,7 +83,7 @@ const Navbar = () => {
                   </Link>
                 </li>
               )}
-              
+
               <li className="nav-item">
                 <button className="logout-btn" onClick={handleLogout}>
                   Logout

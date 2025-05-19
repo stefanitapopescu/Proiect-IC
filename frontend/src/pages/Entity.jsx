@@ -2,19 +2,23 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import './Entity.css';
+import LocationAutocompleteMap from '../components/LocationAutocompleteMap';
+import Cookies from 'js-cookie';
 
 function Entity() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     location: "",
+    locationLat: null,
+    locationLng: null,
     category: "",
     requestedVolunteers: 0,
     actionDate: "",
     rewardItems: [],
   });
 
-  const [rewardItem, setRewardItem] = useState({ name: "", quantity: 0, tag: "" });
+  const [rewardItem, setRewardItem] = useState({ name: "", quantity: 1, tag: "" });
   const [useRewardItems, setUseRewardItems] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
@@ -44,7 +48,7 @@ function Entity() {
       ...formData,
       rewardItems: [...formData.rewardItems, itemToAdd],
     });
-    setRewardItem({ name: "", quantity: 0, tag: "" });
+    setRewardItem({ name: "", quantity: 1, tag: "" });
     setMessage("Obiect adăugat cu succes!");
     setMessageType("success");
 
@@ -92,6 +96,8 @@ function Entity() {
           title: "",
           description: "",
           location: "",
+          locationLat: null,
+          locationLng: null,
           category: "",
           requestedVolunteers: 0,
           actionDate: "",
@@ -113,6 +119,8 @@ function Entity() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userType');
+    Cookies.remove('token');
+    Cookies.remove('userType');
     navigate('/login');
   };
 
@@ -172,14 +180,10 @@ function Entity() {
 
             <div className="form-group">
               <label htmlFor="location">Locație</label>
-              <input
-                type="text"
-                id="location"
-                name="location"
+              <LocationAutocompleteMap
                 value={formData.location}
-                placeholder="Adresa sau locația exactă"
-                onChange={handleChange}
-                required
+                coords={formData.locationLat && formData.locationLng ? [formData.locationLat, formData.locationLng] : null}
+                onLocationSelect={({ address, lat, lng }) => setFormData(f => ({ ...f, location: address, locationLat: lat, locationLng: lng }))}
               />
             </div>
 
@@ -276,7 +280,6 @@ function Entity() {
                         name="tag"
                         value={rewardItem.tag}
                         onChange={handleRewardChange}
-                        required
                       >
                         <option value="">Selectează tag</option>
                         <option value="alimente">alimente</option>
