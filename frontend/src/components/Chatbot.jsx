@@ -70,7 +70,7 @@ const Chatbot = () => {
                     text: data.response,
                     timestamp: new Date()
                 };
-                
+
                 setTimeout(() => {
                     setMessages(prev => [...prev, botMessage]);
                     setIsTyping(false);
@@ -85,7 +85,7 @@ const Chatbot = () => {
                 text: 'Îmi pare rău, am întâmpinat o problemă tehnică. Te rog să încerci din nou.',
                 timestamp: new Date()
             };
-            
+
             setTimeout(() => {
                 setMessages(prev => [...prev, errorMessage]);
                 setIsTyping(false);
@@ -105,30 +105,21 @@ const Chatbot = () => {
     };
 
     const formatTime = (timestamp) => {
-        return timestamp.toLocaleTimeString('ro-RO', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+        return timestamp.toLocaleTimeString('ro-RO', {
+            hour: '2-digit',
+            minute: '2-digit'
         });
     };
 
     return (
         <div className="chatbot-container">
             {/* Buton pentru deschiderea chatbot-ului */}
-            <button 
+            <button
                 className={`chatbot-toggle ${isOpen ? 'open' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Deschide chatbot"
             >
-                {isOpen ? (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                ) : (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                )}
+                Ajutor Virtual
             </button>
 
             {/* Fereastra chatbot-ului */}
@@ -142,7 +133,7 @@ const Chatbot = () => {
                                 <span className="status">Online</span>
                             </div>
                         </div>
-                        <button 
+                        <button
                             className="chatbot-close"
                             onClick={() => setIsOpen(false)}
                             aria-label="Închide chatbot"
@@ -206,7 +197,7 @@ const Chatbot = () => {
                                 rows="1"
                                 disabled={isTyping}
                             />
-                            <button 
+                            <button
                                 onClick={() => sendMessage()}
                                 disabled={!inputMessage.trim() || isTyping}
                                 className="send-button"

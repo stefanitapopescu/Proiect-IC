@@ -76,6 +76,8 @@ const Navbar = () => {
                 </>
               )}
 
+              {/* Removed Dashboard link for entity */}
+              {/*
               {userType === 'entity' && (
                 <li className="nav-item">
                   <Link to="/entity" className="nav-link" onClick={() => setMenuOpen(false)}>
@@ -83,6 +85,7 @@ const Navbar = () => {
                   </Link>
                 </li>
               )}
+              */}
 
               <li className="nav-item">
                 <button className="logout-btn" onClick={handleLogout}>

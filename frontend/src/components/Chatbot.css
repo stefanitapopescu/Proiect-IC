@@ -3,55 +3,33 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 50%;
+    width: 150px;
+    height: 50px;
+    border-radius: 8px;
+    background-color: #3498db;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     z-index: 1000;
     border: none;
     color: white;
-    font-size: 24px;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 0 15px;
+    text-align: center;
 }
 
 .chatbot-toggle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+    background-color: #2980b9;
 }
 
 .chatbot-toggle.open {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-}
-
-.chatbot-icon {
-    font-size: 24px;
-    color: white;
-    transition: all 0.3s ease;
-}
-
-.chatbot-tooltip {
-    position: absolute;
-    right: 70px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-.chatbot-toggle:hover .chatbot-tooltip {
-    opacity: 1;
+    background-color: #2980b9;
 }
 
 /* Chatbot Container */
@@ -84,6 +62,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -234,10 +213,14 @@
 }
 
 @keyframes typing {
-    0%, 80%, 100% {
+
+    0%,
+    80%,
+    100% {
         transform: scale(0.8);
         opacity: 0.5;
     }
+
     40% {
         transform: scale(1);
         opacity: 1;
@@ -348,17 +331,17 @@
         bottom: 10px;
         right: 10px;
     }
-    
+
     .chatbot-window {
         width: calc(100vw - 20px);
         height: calc(100vh - 100px);
         bottom: 70px;
         right: -10px;
     }
-    
+
     .chatbot-toggle {
         width: 50px;
         height: 50px;
         font-size: 20px;
     }
-} 
+}

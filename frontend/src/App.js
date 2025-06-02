@@ -1,5 +1,5 @@
 import "./axiosConfig";
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -17,8 +17,11 @@ import ResetPassword from "./pages/ResetPassword";
 import ResetPasswordConfirm from "./pages/ResetPasswordConfirm";
 import "./styles.css";
 import Cookies from 'js-cookie';
+import ChatbotVisibilityManager from './components/ChatbotVisibilityManager';
 
 function App() {
+  const [userType, setUserType] = useState(localStorage.getItem('userType'));
+
   useEffect(() => {
     const cookieToken = Cookies.get('token');
     if (cookieToken && !localStorage.getItem('token')) {
@@ -28,12 +31,13 @@ function App() {
     if (cookieUserType && !localStorage.getItem('userType')) {
       localStorage.setItem('userType', cookieUserType);
     }
-  }, []);
+    setUserType(localStorage.getItem('userType'));
+  }, [localStorage.getItem('userType')]);
 
   return (
     <Router>
       <div className="app-container">
-        <Navbar />
+        <Navbar userType={userType} />
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -86,7 +90,7 @@ function App() {
           </Routes>
         </main>
         <Footer />
-        <Chatbot />
+        <ChatbotVisibilityManager />
       </div>
     </Router>
   );
