@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Document(collection = "volunteerActions")
 @Data
@@ -28,4 +30,5 @@ public class VolunteerAction {
     private String date;
     private String postedBy;
     private List<String> joinedUserIds = new ArrayList<>();
+    private Map<String, Boolean> attendance = new HashMap<>(); // Map<username, present_status>
 }

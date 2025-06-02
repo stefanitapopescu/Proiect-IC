@@ -10,11 +10,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.example.demo.dto.VolunteerJoinedActionDTO;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class VolunteerService {
@@ -46,14 +48,6 @@ public class VolunteerService {
         action.getJoinedUserIds().add(username);
         action.setAllocatedVolunteers(action.getAllocatedVolunteers() + 1);
         volunteerActionRepository.save(action);
-
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isPresent()) {
-            User volunteer = userOptional.get();
-            int currentPoints = volunteer.getPoints() != null ? volunteer.getPoints() : 0;
-            volunteer.setPoints(currentPoints + 10);
-            userRepository.save(volunteer);
-        }
     }
 
     public Iterable<VolunteerAction> getAllActions(String sortBy) {
@@ -77,5 +71,38 @@ public class VolunteerService {
         
         logger.info("Returned {} actions", actions.size());
         return actions;
+    }
+
+    public List<VolunteerJoinedActionDTO> getJoinedActions(String username) {
+        List<VolunteerAction> joinedActions = volunteerActionRepository.findAll().stream()
+                .filter(action -> action.getJoinedUserIds().contains(username))
+                .collect(Collectors.toList());
+
+        return joinedActions.stream().map(action -> {
+            VolunteerJoinedActionDTO dto = new VolunteerJoinedActionDTO();
+            dto.setId(action.getId());
+            dto.setTitle(action.getTitle());
+            dto.setDescription(action.getDescription());
+            dto.setLocation(action.getLocation());
+            dto.setLocationLat(action.getLocationLat());
+            dto.setLocationLng(action.getLocationLng());
+            dto.setType(action.getType());
+            dto.setCategory(action.getCategory());
+            dto.setImageUrl(action.getImageUrl());
+            dto.setRequestedVolunteers(action.getRequestedVolunteers());
+            dto.setAllocatedVolunteers(action.getAllocatedVolunteers());
+            dto.setActionDate(action.getActionDate());
+            dto.setDate(action.getDate());
+            dto.setPostedBy(action.getPostedBy());
+            
+            // Check attendance status for the current user
+            boolean attended = action.getAttendance() != null && action.getAttendance().getOrDefault(username, false);
+            dto.setAttended(attended);
+            
+            // Include reward items if needed on the frontend
+            dto.setRewardItems(null); // Assuming reward items are not needed in this view
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

@@ -11,11 +11,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import com.example.demo.dto.VolunteerJoinedActionDTO;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,5 +90,14 @@ public class VolunteerController {
                     user.getUsername(), user.getRole(), user.getUserType(), user.getPoints());
             return user.getPoints();
         }).orElse(0);
+    }
+
+    @GetMapping("/joined-actions")
+    public ResponseEntity<List<VolunteerJoinedActionDTO>> getJoinedActions() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        logger.info("GET /joined-actions - User: {}", auth.getName());
+        
+        List<VolunteerJoinedActionDTO> joinedActions = volunteerService.getJoinedActions(auth.getName());
+        return ResponseEntity.ok(joinedActions);
     }
 }

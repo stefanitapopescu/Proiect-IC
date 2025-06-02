@@ -21,4 +21,5 @@ public class User {
     private String userType; 
     private Integer points = 0; 
     private List<String> boughtRewardIds = new ArrayList<>();
+    private String phone;
 }
