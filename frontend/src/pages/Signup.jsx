@@ -15,7 +15,8 @@ function Signup() {
     username: '',
     password: '',
     confirmPassword: '',
-    userType: 'volunteer'
+    userType: 'volunteer',
+    phone: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,6 +37,7 @@ function Signup() {
   const [emailError, setEmailError] = useState('');
   const [emailSuccess, setEmailSuccess] = useState('');
   const [confirmSuccess, setConfirmSuccess] = useState('');
+  const [phoneError, setPhoneError] = useState('');
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@(gmail\.com|yahoo\.com)$/i;
@@ -49,6 +51,16 @@ function Signup() {
     return true;
   };
 
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(phone)) {
+      setPhoneError('Numărul de telefon trebuie să conțină exact 10 cifre');
+      return false;
+    }
+    setPhoneError('');
+    return true;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -57,6 +69,9 @@ function Signup() {
     }));
     if (name === 'email') {
       validateEmail(value);
+    }
+    if (name === 'phone') {
+      validatePhone(value);
     }
     if (name === 'password') {
       const allValid = passwordCriteria.every(c => c.test(value));
@@ -106,12 +121,18 @@ function Signup() {
       return;
     }
 
+    if (!validatePhone(formData.phone)) {
+      setLoading(false);
+      return;
+    }
+
     const apiData = {
       name: formData.name,
       email: formData.email,
       username: formData.username,
       password: formData.password,
-      userType: formData.userType
+      userType: formData.userType,
+      phone: formData.phone
     };
 
     try {
@@ -186,6 +207,21 @@ function Signup() {
                 required
                 placeholder="Alege un nume de utilizator"
               />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="phone">Număr de telefon</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                placeholder="Introdu numărul de telefon (10 cifre)"
+                pattern="[0-9]{10}"
+              />
+              {phoneError && <div className="field-error">{phoneError}</div>}
             </div>
 
             <div className="form-group">

@@ -19,11 +19,11 @@ const Card = ({
 
   const getCategoryLabel = (categoryValue) => {
     const categories = {
-      'environment': 'Mediu',
+      'Mediu': 'Mediu',
       'social': 'Social',
-      'education': 'Educație',
-      'health': 'Sănătate',
-      'community': 'Comunitate'
+      'Educație': 'Educație',
+      'Sănătate': 'Sănătate',
+      'Comunitate': 'Comunitate'
     };
     return categories[categoryValue] || categoryValue;
   };

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Card from '../components/Card';
 import ActionLocationMap from '../components/ActionLocationMap';
+import JoinedActionsModal from '../components/JoinedActionsModal';
 import './Volunteer.css';
 
 function Volunteer() {
@@ -10,10 +11,11 @@ function Volunteer() {
   const [signupMessages, setSignupMessages] = useState({});
   const [joinedActions, setJoinedActions] = useState({});
   const [points, setPoints] = useState(0);
-  const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
   const [expandedAction, setExpandedAction] = useState(null);
   const [showMapFor, setShowMapFor] = useState(null);
+  const [showJoinedActionsModal, setShowJoinedActionsModal] = useState(false);
   const navigate = useNavigate();
 
   const authAxios = axios.create();
@@ -108,13 +110,6 @@ function Volunteer() {
     authAxios.get("http://localhost:8080/api/volunteer/actions")
       .then(response => {
         console.log('Actions fetched successfully:', response.data);
-        if (Array.isArray(response.data)) {
-          console.log('Action categories:', response.data.map(action => ({
-            id: action.id,
-            title: action.title,
-            category: action.category
-          })));
-        }
         setActions(response.data);
       })
       .catch(error => {
@@ -149,7 +144,6 @@ function Volunteer() {
           ...prev,
           [actionId]: true
         }));
-        fetchUserPoints();
       })
       .catch(error => {
         const errorMessage = error.response?.data?.message || "Eroare la înscriere";
@@ -171,13 +165,12 @@ function Volunteer() {
       );
     }
 
-    if (filter !== 'all') {
+    if (locationFilter.trim() !== '') {
+      const locationFilterLower = locationFilter.toLowerCase();
       filteredActions = filteredActions.filter(action => {
-        const actionCategory = action.category ? action.category.toLowerCase() : '';
-        const filterCategory = filter.toLowerCase();
-
-        console.log(`Comparing action category [${actionCategory}] with filter [${filterCategory}]`);
-        return actionCategory === filterCategory;
+        if (!action.location) return false;
+        const locationLower = action.location.toLowerCase();
+        return locationLower.includes(locationFilterLower);
       });
     }
 
@@ -189,9 +182,17 @@ function Volunteer() {
       <div className="content-container">
         <header className="volunteer-header">
           <h1>Oportunități de voluntariat</h1>
-          <div className="user-points">
-            <span className="points-label">Punctele tale:</span>
-            <span className="points-value">{points}</span>
+          <div className="header-actions">
+            <div className="user-points">
+              <span className="points-label">Punctele tale:</span>
+              <span className="points-value">{points}</span>
+            </div>
+            <button
+              className="joined-actions-button"
+              onClick={() => setShowJoinedActionsModal(true)}
+            >
+              Acțiunile mele
+            </button>
           </div>
         </header>
 
@@ -199,37 +200,19 @@ function Volunteer() {
           <div className="search-box">
             <input
               type="text"
-              placeholder="Caută acțiuni..."
+              placeholder="Caută acțiuni (titlu/descriere)"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
-          <div className="category-filters">
-            <button
-              className={filter === 'all' ? 'active' : ''}
-              onClick={() => setFilter('all')}
-            >
-              Toate
-            </button>
-            <button
-              className={filter === 'environment' ? 'active' : ''}
-              onClick={() => setFilter('environment')}
-            >
-              Mediu
-            </button>
-            <button
-              className={filter === 'social' ? 'active' : ''}
-              onClick={() => setFilter('social')}
-            >
-              Social
-            </button>
-            <button
-              className={filter === 'education' ? 'active' : ''}
-              onClick={() => setFilter('education')}
-            >
-              Educație
-            </button>
+          <div className="location-filter-box">
+            <input
+              type="text"
+              placeholder="Filtrează după oraș/județ..."
+              value={locationFilter}
+              onChange={(e) => setLocationFilter(e.target.value)}
+            />
           </div>
         </div>
 
@@ -237,9 +220,7 @@ function Volunteer() {
           {filterActions().map(action => (
             <div key={action.id} className="action-card" style={{ border: '1px solid #eee', borderRadius: 8, boxShadow: '0 2px 8px #eee', padding: 16, textAlign: 'center', minWidth: 0 }}>
               <h2 style={{ margin: 0, color: '#3498db', fontWeight: 700, fontSize: 22 }}>{action.title}</h2>
-              <p style={{ color: '#666', margin: '8px 0 0 0', fontSize: 15, fontWeight: 400 }}>
-                {action.description?.slice(0, 60) || ''}{action.description && action.description.length > 60 ? '...' : ''}
-              </p>
+
               <button
                 style={{ margin: '16px 0 0 0', background: '#3498db', color: 'white', border: 'none', borderRadius: 4, padding: '8px 16px', cursor: 'pointer' }}
                 onClick={() => setExpandedAction(expandedAction === action.id ? null : action.id)}
@@ -278,6 +259,11 @@ function Volunteer() {
           ))}
         </div>
       </div>
+
+      <JoinedActionsModal
+        isOpen={showJoinedActionsModal}
+        onClose={() => setShowJoinedActionsModal(false)}
+      />
     </div>
   );
 }

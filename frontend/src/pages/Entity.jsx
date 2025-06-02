@@ -4,6 +4,7 @@ import axios from "axios";
 import './Entity.css';
 import LocationAutocompleteMap from '../components/LocationAutocompleteMap';
 import Cookies from 'js-cookie';
+import PostedActionsModal from '../components/PostedActionsModal';
 
 function Entity() {
   const [formData, setFormData] = useState({
@@ -22,6 +23,7 @@ function Entity() {
   const [useRewardItems, setUseRewardItems] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const [showPostedActionsModal, setShowPostedActionsModal] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -138,6 +140,12 @@ function Entity() {
         <header className="entity-header">
           <h1>Panou Organizație</h1>
           <button className="logout-button" onClick={handleLogout}>Deconectare</button>
+          <button
+            className="posted-actions-button"
+            onClick={() => setShowPostedActionsModal(true)}
+          >
+            Acțiunile mele postate
+          </button>
         </header>
 
         <div className="entity-form-container">
@@ -327,6 +335,11 @@ function Entity() {
           </form>
         </div>
       </div>
+
+      <PostedActionsModal
+        isOpen={showPostedActionsModal}
+        onClose={() => setShowPostedActionsModal(false)}
+      />
     </div>
   );
 }
