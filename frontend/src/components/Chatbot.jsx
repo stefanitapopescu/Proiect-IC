@@ -6,7 +6,7 @@ const Chatbot = () => {
     const [messages, setMessages] = useState([
         {
             type: 'bot',
-            text: 'Salut! Sunt asistentul virtual al platformei de voluntariat. Cum te pot ajuta?',
+            text: 'Salut! 👋 Sunt asistentul virtual al VolunteerHub!\n\nTe pot ajuta cu găsirea acțiunilor de voluntariat, informații despre puncte și recompense, organizațiile noastre partenere și multe altele.\n\nCu ce te pot ajuta astăzi? 😊',
             timestamp: new Date()
         }
     ]);
@@ -22,24 +22,6 @@ const Chatbot = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
-
-    useEffect(() => {
-        if (isOpen && quickQuestions.length === 0) {
-            fetchQuickQuestions();
-        }
-    }, [isOpen]);
-
-    const fetchQuickQuestions = async () => {
-        try {
-            const response = await fetch('http://localhost:8080/api/chatbot/quick-questions');
-            if (response.ok) {
-                const questions = await response.json();
-                setQuickQuestions(questions);
-            }
-        } catch (error) {
-            console.error('Eroare la încărcarea întrebărilor rapide:', error);
-        }
-    };
 
     const sendMessage = async (messageText = inputMessage) => {
         if (!messageText.trim()) return;
@@ -93,9 +75,11 @@ const Chatbot = () => {
         }
     };
 
+    /* DEZACTIVAT - Nu mai folosim întrebări rapide
     const handleQuickQuestion = (question) => {
         sendMessage(question.text);
     };
+    */
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -169,7 +153,7 @@ const Chatbot = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Întrebări rapide */}
+                    {/* Întrebări rapide - DEZACTIVATE
                     {quickQuestions.length > 0 && messages.length <= 1 && (
                         <div className="quick-questions">
                             <p>Întrebări frecvente:</p>
@@ -186,6 +170,7 @@ const Chatbot = () => {
                             </div>
                         </div>
                     )}
+                    */}
 
                     <div className="chatbot-input">
                         <div className="input-container">

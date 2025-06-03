@@ -26,8 +26,11 @@ function Home() {
             </div>
           </div>
           <div className="hero-image">
-            {/* add image  */}
-            <div className="placeholder-image"></div>
+            <img 
+              src="/volunteerhub-hero.svg"
+              alt="VolunteerHub - Platforma care conectează voluntarii cu organizațiile pentru impact pozitiv în comunitate. Câștigă puncte și recompense prin voluntariat!"
+              className="hero-volunteer-image"
+            />
           </div>
         </div>
       </section>
