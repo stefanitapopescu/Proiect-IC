@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Chatbot from "./components/Chatbot";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
@@ -31,8 +30,9 @@ function App() {
     if (cookieUserType && !localStorage.getItem('userType')) {
       localStorage.setItem('userType', cookieUserType);
     }
-    setUserType(localStorage.getItem('userType'));
-  }, [localStorage.getItem('userType')]);
+    const storedUserType = localStorage.getItem('userType');
+    setUserType(storedUserType);
+  }, []);
 
   return (
     <Router>
@@ -46,7 +46,6 @@ function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/reset-password/confirm" element={<ResetPasswordConfirm />} />
 
-            {/* RUTE PROTEJATE */}
             <Route
               path="/volunteer-home"
               element={

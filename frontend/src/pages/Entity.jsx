@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import './Entity.css';
 import LocationAutocompleteMap from '../components/LocationAutocompleteMap';
-import Cookies from 'js-cookie';
 import PostedActionsModal from '../components/PostedActionsModal';
 
 function Entity() {
@@ -24,7 +22,6 @@ function Entity() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [showPostedActionsModal, setShowPostedActionsModal] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -118,14 +115,6 @@ function Entity() {
       });
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userType');
-    Cookies.remove('token');
-    Cookies.remove('userType');
-    navigate('/login');
-  };
-
   const categories = [
     { value: "environment", label: "Mediu" },
     { value: "social", label: "Social" },
@@ -139,7 +128,6 @@ function Entity() {
       <div className="content-container">
         <header className="entity-header">
           <h1>Panou Organizație</h1>
-          <button className="logout-button" onClick={handleLogout}>Deconectare</button>
           <button
             className="posted-actions-button"
             onClick={() => setShowPostedActionsModal(true)}

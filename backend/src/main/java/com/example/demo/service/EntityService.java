@@ -78,7 +78,6 @@ public class EntityService {
             rewardItem.setName(rewardDTO.getName());
             rewardItem.setQuantity(rewardDTO.getQuantity());
             rewardItem.setVolunteerActionId(savedAction.getId());
-            // Adăugat copia tag-ului din DTO
             rewardItem.setTag(rewardDTO.getTag());
             rewardItemRepository.save(rewardItem);
         });
@@ -102,19 +101,17 @@ public class EntityService {
             actionMap.put("allocatedVolunteers", action.getAllocatedVolunteers());
             actionMap.put("actionDate", action.getActionDate());
             actionMap.put("date", action.getDate());
-            actionMap.put("attendance", action.getAttendance()); // Include attendance
+            actionMap.put("attendance", action.getAttendance());
 
-            // Get volunteer information
             List<Map<String, Object>> volunteers = action.getJoinedUserIds().stream()
                     .map(userId -> {
                         User user = userRepository.findByUsername(userId).orElse(null);
                         if (user != null) {
                             Map<String, Object> volunteerMap = new HashMap<>();
                             volunteerMap.put("username", user.getUsername());
-                            volunteerMap.put("name", user.getName()); // Use getName for full name
+                            volunteerMap.put("name", user.getName());
                             volunteerMap.put("email", user.getEmail());
                             volunteerMap.put("phone", user.getPhone());
-                            // Include attendance status for this volunteer
                             volunteerMap.put("present", action.getAttendance().getOrDefault(user.getUsername(), false));
                             return volunteerMap;
                         }
@@ -136,28 +133,24 @@ public class EntityService {
 
         VolunteerAction action = actionOpt.get();
         
-        // Get the previous attendance status to avoid duplicate point awards
         Map<String, Boolean> previousAttendance = action.getAttendance() != null ? new HashMap<>(action.getAttendance()) : new HashMap<>();
         
-        // Update attendance map based on provided data
         Map<String, Boolean> updatedAttendance = previousAttendance != null ? new HashMap<>(previousAttendance) : new HashMap<>();
         
         for (VolunteerAttendanceDTO attendanceDTO : attendanceData) {
             String username = attendanceDTO.getUsername();
             boolean isPresent = attendanceDTO.isPresent();
             
-            // Only update attendance for volunteers who are actually joined in this action
             if (action.getJoinedUserIds().contains(username)) {
                  updatedAttendance.put(username, isPresent);
                  
-                 // Award points if the volunteer is marked present and was not marked present before
                  boolean wasPresentBefore = previousAttendance.getOrDefault(username, false);
                  if (isPresent && !wasPresentBefore) {
                      Optional<User> userOptional = userRepository.findByUsername(username);
                      if (userOptional.isPresent()) {
                          User volunteer = userOptional.get();
                          int currentPoints = volunteer.getPoints() != null ? volunteer.getPoints() : 0;
-                         volunteer.setPoints(currentPoints + 10); // Award 10 points
+                         volunteer.setPoints(currentPoints + 10);
                          userRepository.save(volunteer);
                      }
                  }
@@ -166,5 +159,100 @@ public class EntityService {
         action.setAttendance(updatedAttendance);
         
         volunteerActionRepository.save(action);
+    }
+
+    public void deleteVolunteerAction(String actionId, String username) {
+        Optional<VolunteerAction> actionOpt = volunteerActionRepository.findById(actionId);
+        if (actionOpt.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Acțiunea nu a fost găsită.");
+        }
+
+        VolunteerAction action = actionOpt.get();
+        
+        if (!action.getPostedBy().equals(username)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Nu aveți permisiunea să ștergeți această acțiune.");
+        }
+
+        List<RewardItem> rewardItems = rewardItemRepository.findAll().stream()
+                .filter(item -> actionId.equals(item.getVolunteerActionId()))
+                .collect(Collectors.toList());
+        
+        rewardItems.forEach(item -> rewardItemRepository.deleteById(item.getId()));
+        
+        volunteerActionRepository.deleteById(actionId);
+    }
+
+    public void updateVolunteerAction(String actionId, NewVolunteerActionRequest request, String username) {
+        Optional<VolunteerAction> actionOpt = volunteerActionRepository.findById(actionId);
+        if (actionOpt.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Acțiunea nu a fost găsită.");
+        }
+
+        VolunteerAction action = actionOpt.get();
+        
+        if (!action.getPostedBy().equals(username)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Nu aveți permisiunea să modificați această acțiune.");
+        }
+
+        List<RewardItem> existingRewardItems = rewardItemRepository.findAll().stream()
+                .filter(item -> actionId.equals(item.getVolunteerActionId()))
+                .collect(Collectors.toList());
+
+        if (request.getRequestedVolunteers() > 0) {
+            if (request.getRewardItems() == null || request.getRewardItems().isEmpty()) {
+                if (existingRewardItems.isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Trebuie să adăugați cel puțin un premiu dacă numărul de voluntari solicitați este mai mare de 0!");
+                }
+                int existingTotalRewards = existingRewardItems.stream()
+                        .mapToInt(RewardItem::getQuantity)
+                        .sum();
+                if (existingTotalRewards < request.getRequestedVolunteers()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Totalul obiectelor oferite ca premii trebuie să fie cel puțin egal cu numărul de voluntari solicitați.");
+                }
+            } else {
+                int totalRewards = request.getRewardItems()
+                        .stream()
+                        .mapToInt(item -> item.getQuantity())
+                        .sum();
+
+                if (totalRewards < request.getRequestedVolunteers()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Totalul obiectelor oferite ca premii trebuie să fie cel puțin egal cu numărul de voluntari solicitați.");
+                }
+            }
+        }
+
+        action.setTitle(request.getTitle());
+        action.setDescription(request.getDescription());
+        action.setLocation(request.getLocation());
+        action.setLocationLat(request.getLocationLat());
+        action.setLocationLng(request.getLocationLng());
+        action.setType(request.getType());
+        action.setCategory(request.getCategory());
+        action.setRequestedVolunteers(request.getRequestedVolunteers());
+        action.setActionDate(request.getActionDate());
+        
+        if (request.getActionDate() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+            String formattedDate = request.getActionDate().format(formatter);
+            action.setDate(formattedDate);
+        }
+
+        volunteerActionRepository.save(action);
+
+        if (request.getRewardItems() != null && !request.getRewardItems().isEmpty()) {
+            existingRewardItems.forEach(item -> rewardItemRepository.deleteById(item.getId()));
+
+            request.getRewardItems().forEach(rewardDTO -> {
+                RewardItem rewardItem = new RewardItem();
+                rewardItem.setName(rewardDTO.getName());
+                rewardItem.setQuantity(rewardDTO.getQuantity());
+                rewardItem.setVolunteerActionId(actionId);
+                rewardItem.setTag(rewardDTO.getTag());
+                rewardItemRepository.save(rewardItem);
+            });
+        }
     }
 }

@@ -22,7 +22,6 @@ public class RecommendationController {
     public ResponseEntity<List<VolunteerAction>> getPersonalizedRecommendations(Authentication authentication) {
         try {
             if (authentication == null || authentication.getName() == null) {
-                // Pentru utilizatori neautentificați, returnează acțiuni populare
                 return ResponseEntity.ok(recommendationService.getPersonalizedRecommendations(null));
             }
             

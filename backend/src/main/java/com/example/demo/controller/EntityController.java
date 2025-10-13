@@ -26,7 +26,6 @@ public class EntityController {
     @Autowired
     private EntityService entityService;
 
-  
     @PostMapping("/post-action")
     public ResponseEntity<?> postVolunteerAction(@RequestBody NewVolunteerActionRequest request) {
         try {
@@ -61,6 +60,40 @@ public class EntityController {
             logger.error("Error saving attendance for action {}: {}", actionId, ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                  .body("Error saving attendance.");
+        }
+    }
+
+    @DeleteMapping("/actions/{actionId}")
+    public ResponseEntity<?> deleteVolunteerAction(@PathVariable String actionId) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            entityService.deleteVolunteerAction(actionId, auth.getName());
+            return ResponseEntity.ok("Acțiunea a fost ștearsă cu succes!");
+        } catch (ResponseStatusException ex) {
+            return ResponseEntity.status(ex.getStatusCode())
+                                 .body(ex.getReason());
+        } catch (Exception ex) {
+            logger.error("Error deleting action {}: {}", actionId, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Eroare la ștergerea acțiunii.");
+        }
+    }
+
+    @PutMapping("/actions/{actionId}")
+    public ResponseEntity<?> updateVolunteerAction(
+            @PathVariable String actionId,
+            @RequestBody NewVolunteerActionRequest request) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            entityService.updateVolunteerAction(actionId, request, auth.getName());
+            return ResponseEntity.ok("Acțiunea a fost actualizată cu succes!");
+        } catch (ResponseStatusException ex) {
+            return ResponseEntity.status(ex.getStatusCode())
+                                 .body(ex.getReason());
+        } catch (Exception ex) {
+            logger.error("Error updating action {}: {}", actionId, ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Eroare la actualizarea acțiunii.");
         }
     }
 }

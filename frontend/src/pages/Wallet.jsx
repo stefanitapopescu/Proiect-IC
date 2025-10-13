@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import "./Wallet.css";
 
 function Wallet() {
@@ -21,17 +20,8 @@ function Wallet() {
       });
   }, []);
 
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
   return (
     <div className="wallet-page">
-      <button className="logout-button" onClick={handleLogout}>
-        Logout
-      </button>
       <h2>Portofel - Rewarduri Cumpărate</h2>
       <div className="wallet-list">
         {boughtRewards.length === 0 ? (
@@ -40,6 +30,15 @@ function Wallet() {
           boughtRewards.map((reward) => (
             <div key={reward.id} className="wallet-card">
               <h3>{reward.name}</h3>
+              <div className="quantity-badge">
+                <span className="quantity-label">Cantitate:</span>
+                <span className="quantity-value">{reward.quantity}</span>
+              </div>
+              {reward.tag && (
+                <div className="reward-tag">
+                  <span>{reward.tag}</span>
+                </div>
+              )}
             </div>
           ))
         )}

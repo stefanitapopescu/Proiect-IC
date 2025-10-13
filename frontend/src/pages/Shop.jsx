@@ -1,5 +1,4 @@
-// src/components/Shop.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import './Shop.css';
@@ -10,17 +9,7 @@ function Shop() {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-    fetchRewards();
-    fetchUserPoints();
-  }, [navigate]);
-
-  const fetchRewards = () => {
+  const fetchRewards = useCallback(() => {
     const token = localStorage.getItem('token');
     axios.get('http://localhost:8080/api/shop/rewards', {
       headers: { Authorization: `Bearer ${token}` }
@@ -32,9 +21,9 @@ function Shop() {
         navigate('/login');
       }
     });
-  };
+  }, [navigate]);
 
-  const fetchUserPoints = () => {
+  const fetchUserPoints = useCallback(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
     axios.get('http://localhost:8080/api/volunteer/points', {
@@ -47,7 +36,17 @@ function Shop() {
         navigate('/login');
       }
     });
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    fetchRewards();
+    fetchUserPoints();
+  }, [navigate, fetchRewards, fetchUserPoints]);
 
   const handleBuy = (rewardId, pointCost) => {
     const token = localStorage.getItem('token');
@@ -64,7 +63,6 @@ function Shop() {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(response => {
-      // extragem textul din obiectul { message: "..."}
       const msg = response.data?.message || response.data;
       setMessage(msg);
       fetchRewards();
@@ -73,7 +71,6 @@ function Shop() {
     .catch(error => {
       console.error("Eroare la cumpărare:", error);
       if (error.response) {
-        // dacă serverul trimite { message: "..." }
         if (error.response.data?.message) {
           setMessage(error.response.data.message);
         } else if (error.response.status === 403) {

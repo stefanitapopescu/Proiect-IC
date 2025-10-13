@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import './Login.css';
 
-// Iconițe FontAwesome pentru ochi
 const EyeIcon = ({ open }) => (
     <i className={open ? 'fas fa-eye' : 'fas fa-eye-slash'} style={{ cursor: 'pointer', fontSize: '1.2rem', color: '#888' }}></i>
 );

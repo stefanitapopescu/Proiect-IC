@@ -143,12 +143,11 @@ public class AuthService {
         User user = userOpt.get();
         passwordResetTokenRepo.deleteByUserId(user.getId());
         String token = java.util.UUID.randomUUID().toString();
-        Date expiry = new Date(System.currentTimeMillis() + 1000 * 60 * 60); // 1 oră
+        Date expiry = new Date(System.currentTimeMillis() + 1000 * 60 * 60);
         PasswordResetToken resetToken = new PasswordResetToken(null, user.getId(), token, expiry);
         passwordResetTokenRepo.save(resetToken);
         String link = "http://localhost:3000/reset-password/confirm?token=" + token;
 
-        // Trimite email real
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setFrom(fromEmail);

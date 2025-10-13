@@ -21,6 +21,6 @@ public class VolunteerJoinedActionDTO {
     private LocalDateTime actionDate;
     private String date;
     private String postedBy;
-    private boolean attended; // Attendance status for the logged-in volunteer
-    private List<RewardItem> rewardItems; // Include reward items if needed on frontend
+    private boolean attended;
+    private List<RewardItem> rewardItems;
 } 

@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.RewardItem;
 import com.example.demo.dto.RewardItemDTO;
+import com.example.demo.dto.WalletItemDTO;
 import com.example.demo.service.ShopService;
 import com.example.demo.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class ShopController {
     }
 
     @GetMapping("/wallet")
-    public List<RewardItem> getUserBoughtRewards(@RequestHeader("Authorization") String token) {
+    public List<WalletItemDTO> getUserBoughtRewards(@RequestHeader("Authorization") String token) {
         String username = jwtUtil.extractUsername(token.substring(7));
         return shopService.getUserBoughtRewards(username);
     }

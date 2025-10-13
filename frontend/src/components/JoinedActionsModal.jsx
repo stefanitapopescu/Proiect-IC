@@ -6,7 +6,7 @@ function JoinedActionsModal({ isOpen, onClose }) {
     const [joinedActions, setJoinedActions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [sortBy, setSortBy] = useState('date'); // 'date', 'title', 'timeLeft'
+    const [sortBy, setSortBy] = useState('date');
 
     useEffect(() => {
         if (isOpen) {

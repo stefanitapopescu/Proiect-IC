@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Login.css';
 
-// Iconițe FontAwesome pentru ochi
 const EyeIcon = ({ open }) => (
   <i className={open ? 'fas fa-eye' : 'fas fa-eye-slash'} style={{ cursor: 'pointer', fontSize: '1.2rem', color: '#888' }}></i>
 );
@@ -22,7 +21,6 @@ function Signup() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Validare parolă: minim 6 caractere, o cifră, o literă mare, o literă mică, un semn de punctuație
   const passwordCriteria = [
     { label: 'Cel puțin 6 caractere', test: pwd => pwd.length >= 6 },
     { label: 'O literă mare', test: pwd => /[A-Z]/.test(pwd) },
@@ -248,7 +246,6 @@ function Signup() {
                   <EyeIcon open={showPassword} />
                 </span>
               </div>
-              {/* Bulinuțe colorate pentru validare parolă */}
               <ul className="password-criteria-list">
                 {passwordCriteria.map((c, idx) => {
                   const valid = c.test(formData.password);

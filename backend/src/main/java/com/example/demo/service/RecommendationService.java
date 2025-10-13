@@ -25,7 +25,6 @@ public class RecommendationService {
         List<VolunteerAction> allActions = volunteerActionRepository.findAll();
         
         if (userId == null) {
-            // Pentru utilizatori neautentificați, returnează acțiuni populare
             return allActions.stream()
                     .sorted((a, b) -> Integer.compare(
                             b.getJoinedUserIds() != null ? b.getJoinedUserIds().size() : 0,
@@ -42,7 +41,6 @@ public class RecommendationService {
         
         User user = userOpt.get();
         
-        // Calculează scorul pentru fiecare acțiune
         List<ScoredAction> scoredActions = allActions.stream()
                 .map(action -> new ScoredAction(action, calculateScore(action, user, allActions)))
                 .sorted((a, b) -> Double.compare(b.score, a.score))
@@ -77,13 +75,11 @@ public class RecommendationService {
         User user = userOpt.get();
         List<VolunteerAction> allActions = volunteerActionRepository.findAll();
         
-        // Calculează statistici utilizator
         List<VolunteerAction> userActions = allActions.stream()
                 .filter(action -> action.getJoinedUserIds() != null && 
                         action.getJoinedUserIds().contains(userId))
                 .collect(Collectors.toList());
         
-        // Nivel experiență
         int totalActions = userActions.size();
         String experienceLevel;
         if (totalActions == 0) {
@@ -96,7 +92,6 @@ public class RecommendationService {
             experienceLevel = "Expert";
         }
         
-        // Categoria preferată
         String preferredCategory = userActions.stream()
                 .collect(Collectors.groupingBy(VolunteerAction::getCategory, Collectors.counting()))
                 .entrySet().stream()
@@ -115,13 +110,11 @@ public class RecommendationService {
     private double calculateScore(VolunteerAction action, User user, List<VolunteerAction> allActions) {
         double score = 0.0;
         
-        // 1. Preferința pentru categorie (40% din scor)
         String preferredCategory = getUserPreferredCategory(user, allActions);
         if (preferredCategory.equals(action.getCategory())) {
             score += 0.4;
         }
         
-        // 2. Popularitatea acțiunii (20% din scor)
         int joinedCount = action.getJoinedUserIds() != null ? action.getJoinedUserIds().size() : 0;
         int requestedCount = action.getRequestedVolunteers();
         if (requestedCount > 0) {
@@ -129,17 +122,15 @@ public class RecommendationService {
             score += 0.2 * Math.min(popularityRatio, 1.0);
         }
         
-        // 3. Urgența (20% din scor) - acțiuni cu mai puțini voluntari sunt mai urgente
         if (requestedCount > 0) {
             double urgencyRatio = 1.0 - ((double) joinedCount / requestedCount);
             score += 0.2 * urgencyRatio;
         }
         
-        // 4. Experiența utilizatorului (20% din scor)
         int userExperience = getUserExperienceLevel(user, allActions);
-        if (userExperience > 5) { // Utilizatori experimentați primesc acțiuni mai complexe
+        if (userExperience > 5) {
             score += 0.2;
-        } else { // Utilizatori noi primesc acțiuni mai simple
+        } else {
             score += 0.1;
         }
         

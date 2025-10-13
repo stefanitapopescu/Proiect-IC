@@ -30,5 +30,5 @@ public class VolunteerAction {
     private String date;
     private String postedBy;
     private List<String> joinedUserIds = new ArrayList<>();
-    private Map<String, Boolean> attendance = new HashMap<>(); // Map<username, present_status>
+    private Map<String, Boolean> attendance = new HashMap<>();
 }

@@ -7,7 +7,6 @@ function Home() {
 
   return (
     <div className="home-page">
-      {}
       <section className="hero-section">
         <div className="content-container hero-container">
           <div className="hero-content">
@@ -35,7 +34,6 @@ function Home() {
         </div>
       </section>
       
-      {}
       <section className="how-it-works-section">
         <div className="content-container">
           <h2 className="section-header">Cum funcționează</h2>
@@ -64,7 +62,6 @@ function Home() {
         </div>
       </section>
       
-      {}
       <section className="features-section">
         <div className="content-container">
           <h2 className="section-header">Ce oferim</h2>
@@ -94,7 +91,6 @@ function Home() {
         </div>
       </section>
       
-      {}
       <section className="cta-section">
         <div className="content-container">
           <h2>Gata să faci o diferență?</h2>

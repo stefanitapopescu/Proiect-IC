@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.RewardItemDTO;
+import com.example.demo.dto.WalletItemDTO;
 import com.example.demo.model.RewardItem;
 import com.example.demo.model.User;
 import com.example.demo.repository.RewardItemRepository;
@@ -10,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.HashMap;
 
 @Service
 public class ShopService {
@@ -24,7 +27,6 @@ public class ShopService {
     
   public List<RewardItemDTO> getAllRewards() {
   return rewardItemRepository.findAll().stream()
-    // (opțional) filtrează dacă unele docuri au tag null
     .filter(r -> r.getTag() != null)
     .map(reward -> {
       RewardItemDTO dto = new RewardItemDTO();
@@ -70,9 +72,30 @@ public class ShopService {
     }
 
   
-    public List<RewardItem> getUserBoughtRewards(String username) {
+    public List<WalletItemDTO> getUserBoughtRewards(String username) {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        return rewardItemRepository.findAllById(user.getBoughtRewardIds());
+        
+        Map<String, Long> rewardCounts = user.getBoughtRewardIds().stream()
+            .collect(Collectors.groupingBy(id -> id, Collectors.counting()));
+        
+        return rewardCounts.entrySet().stream()
+            .map(entry -> {
+                String rewardId = entry.getKey();
+                Long count = entry.getValue();
+                
+                RewardItem reward = rewardItemRepository.findById(rewardId).orElse(null);
+                if (reward != null) {
+                    return new WalletItemDTO(
+                        reward.getId(),
+                        reward.getName(),
+                        reward.getTag(),
+                        count.intValue()
+                    );
+                }
+                return null;
+            })
+            .filter(dto -> dto != null)
+            .collect(Collectors.toList());
     }
 }

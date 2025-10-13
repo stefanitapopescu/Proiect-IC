@@ -63,7 +63,7 @@ public class VolunteerService {
             if ((action.getDate() == null || action.getDate().isEmpty()) && action.getActionDate() != null) {
                 String formattedDate = action.getActionDate().format(formatter);
                 action.setDate(formattedDate);
-                volunteerActionRepository.save(action); 
+                volunteerActionRepository.save(action);
             }
             
             actions.add(action);
@@ -95,12 +95,10 @@ public class VolunteerService {
             dto.setDate(action.getDate());
             dto.setPostedBy(action.getPostedBy());
             
-            // Check attendance status for the current user
             boolean attended = action.getAttendance() != null && action.getAttendance().getOrDefault(username, false);
             dto.setAttended(attended);
             
-            // Include reward items if needed on the frontend
-            dto.setRewardItems(null); // Assuming reward items are not needed in this view
+            dto.setRewardItems(null);
 
             return dto;
         }).collect(Collectors.toList());

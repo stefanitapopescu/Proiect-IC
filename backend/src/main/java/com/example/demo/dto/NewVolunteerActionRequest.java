@@ -11,7 +11,7 @@ public class NewVolunteerActionRequest {
     private String location;
     private Double locationLat;
     private Double locationLng;
-    private String type; 
+    private String type;
     private String category;
     private int requestedVolunteers;
     private LocalDateTime actionDate;

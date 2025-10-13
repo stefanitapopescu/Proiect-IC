@@ -15,11 +15,12 @@ public class ChatbotController {
     @Value("${groq.api.key:}")
     private String groqApiKey;
     
+    @Value("${gemini.api.key:}")
+    private String geminiApiKey;
+    
     private final RestTemplate restTemplate = new RestTemplate();
     
-    // Răspunsuri esențiale specifice platformei (doar cele critice)
     private final Map<String, String> platformResponses = Map.ofEntries(
-        // Doar informații esențiale hardcodate
         Map.entry("recompense", "🎁 **Recompensele din shop-ul VolunteerHub:**\n\n" +
             "• 🍎 **Alimente** - 10 puncte\n" +
             "• 🏠 **Electrocasnice** - 50 puncte\n" +
@@ -41,15 +42,20 @@ public class ChatbotController {
     public ResponseEntity<Map<String, String>> chat(@RequestBody Map<String, String> request) {
         String userMessage = request.get("message").toLowerCase().trim();
         
-        // Detectează doar întrebările CRITICE hardcodate
+        System.out.println("📝 Mesaj primit: " + userMessage);
+        System.out.println("🔑 Gemini API Key loaded: " + !geminiApiKey.isEmpty());
+        System.out.println("🔑 GROQ API Key loaded: " + !groqApiKey.isEmpty());
+        
         String response = detectCriticalQuestions(userMessage);
         
-        // Pentru tot restul, folosește GROQ AI (mult mai inteligent)
-        if (response == null && !groqApiKey.isEmpty()) {
+        if (response == null && !geminiApiKey.isEmpty()) {
+            System.out.println("→ Folosesc Gemini API");
+            response = callGeminiAPI(userMessage);
+        } else if (response == null && !groqApiKey.isEmpty()) {
+            System.out.println("→ Folosesc GROQ API");
             response = callGroqAPI(userMessage);
         }
         
-        // Fallback la răspuns generic
         if (response == null) {
             response = "Îmi pare rău, am o problemă tehnică momentan. Dar sunt aici să te ajut cu orice întrebare despre VolunteerHub! " +
                       "Încearcă să mă întrebi din nou. 😊";
@@ -62,13 +68,11 @@ public class ChatbotController {
     
     @GetMapping("/quick-questions")
     public ResponseEntity<List<String>> getQuickQuestions() {
-        // Returnează o listă goală - nu mai afișăm întrebări rapide
         List<String> questions = Arrays.asList();
         return ResponseEntity.ok(questions);
     }
     
     private String detectCriticalQuestions(String message) {
-        // Doar pentru întrebări FOARTE specifice despre sistemul de puncte și recompense
         if (containsAny(message, "recompense", "recompensa", "premii", "shop", "magazin", "cumpar", "cumpăr")) {
             return platformResponses.get("recompense");
         }
@@ -77,7 +81,6 @@ public class ChatbotController {
             return platformResponses.get("puncte");
         }
         
-        // Tot restul merge la AI - să fie mai inteligent!
         return null;
     }
     
@@ -100,7 +103,6 @@ public class ChatbotController {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(groqApiKey);
             
-            // Context realist și inteligent despre VolunteerHub pentru AI
             String systemContext = "Ești asistentul virtual al VolunteerHub, o platformă de voluntariat modernă din România.\n\n" +
                 "INFORMAȚII PLATFORMĂ:\n" +
                 "- Conectează voluntarii cu organizații locale și naționale\n" +
@@ -150,7 +152,6 @@ public class ChatbotController {
                     Map<String, Object> messageObj = (Map<String, Object>) choice.get("message");
                     String aiResponse = (String) messageObj.get("content");
                     
-                    // Adaugă context VolunteerHub la sfârșitul răspunsului
                     String contextAddition = "\n\n💡 Dacă ai întrebări specifice despre VolunteerHub (recompense, puncte, înscrierea la acțiuni), întreabă-mă direct! 😊";
                     
                     System.out.println("✅ Răspuns generat cu succes de GROQ!");
@@ -161,9 +162,77 @@ public class ChatbotController {
             System.err.println("❌ Eroare la apelul GROQ API: " + e.getMessage());
             e.printStackTrace();
             
-            // Mesaj de eroare specific pentru utilizatori
             return "Îmi pare rău, am o mică problemă tehnică momentan. Dar pot să îți spun că voluntariatul pe VolunteerHub este o experiență minunată! 😊 " +
                    "Te interesează să afli despre recompensele noastre sau cum să te înscrii la acțiuni?";
+        }
+        
+        return null;
+    }
+    
+    private String callGeminiAPI(String message) {
+        try {
+            System.out.println("🤖 Încercare apel GEMINI API pentru: " + message);
+            
+            String apiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + geminiApiKey;
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            
+            String fullPrompt = "Ești asistentul virtual al VolunteerHub, o platformă de voluntariat modernă din România.\n\n" +
+                "INFORMAȚII PLATFORMĂ:\n" +
+                "- Conectează voluntarii cu organizații locale și naționale\n" +
+                "- Sistem de puncte: câștigi 10 puncte pentru fiecare acțiune completată\n" +
+                "- Shop virtual cu recompense: alimente (10p), jocuri (20p), haine (25p), vouchere (30p), accesorii (15p), electrocasnice (50p)\n" +
+                "- 5 categorii: Mediu, Social, Educație, Sănătate, Comunitate\n\n" +
+                "PERSONALITATEA TA:\n" +
+                "- Ești empatic, prietenos și motivațional\n" +
+                "- Răspunzi în română corectă și naturală\n" +
+                "- Promovezi valorile de solidaritate și impact pozitiv\n" +
+                "- Maximum 150 cuvinte per răspuns\n\n" +
+                "Întrebare utilizator: " + message + "\n\nRăspunsul tău:";
+            
+            Map<String, Object> requestBody = Map.of(
+                "contents", List.of(
+                    Map.of(
+                        "parts", List.of(
+                            Map.of("text", fullPrompt)
+                        )
+                    )
+                ),
+                "generationConfig", Map.of(
+                    "temperature", 0.7,
+                    "maxOutputTokens", 1000,
+                    "topP", 0.9
+                )
+            );
+            
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            
+            System.out.println("📤 Trimitere request către GEMINI API...");
+            ResponseEntity<Map> response = restTemplate.exchange(
+                apiUrl, HttpMethod.POST, entity, Map.class);
+            
+            System.out.println("📥 Status response GEMINI: " + response.getStatusCode());
+            
+            if (response.getBody() != null) {
+                Map<String, Object> responseBody = response.getBody();
+                List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
+                
+                if (candidates != null && !candidates.isEmpty()) {
+                    Map<String, Object> candidate = candidates.get(0);
+                    Map<String, Object> content = (Map<String, Object>) candidate.get("content");
+                    List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
+                    
+                    if (parts != null && !parts.isEmpty()) {
+                        String aiResponse = (String) parts.get(0).get("text");
+                        System.out.println("✅ Răspuns generat cu succes de GEMINI!");
+                        return aiResponse.trim();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Eroare la apelul GEMINI API: " + e.getMessage());
+            e.printStackTrace();
         }
         
         return null;

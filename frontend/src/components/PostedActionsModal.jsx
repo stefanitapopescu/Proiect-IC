@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './PostedActionsModal.css';
+import LocationAutocompleteMap from './LocationAutocompleteMap';
 
 function PostedActionsModal({ isOpen, onClose }) {
     const [postedActions, setPostedActions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [sortBy, setSortBy] = useState('date'); // 'date', 'title', 'volunteers'
+    const [sortBy, setSortBy] = useState('date');
     const [expandedAction, setExpandedAction] = useState(null);
-    // Use actionId and then username for nested state
-    const [attendance, setAttendance] = useState({}); // { actionId: { volunteerUsername: true/false, ... }, ... }
-    const [saveStatus, setSaveStatus] = useState({}); // { actionId: 'saving'/'saved'/'error' }
+    const [attendance, setAttendance] = useState({});
+    const [saveStatus, setSaveStatus] = useState({});
+    const [editingAction, setEditingAction] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -27,13 +29,11 @@ function PostedActionsModal({ isOpen, onClose }) {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            // Initialize attendance state when fetching actions
             const initialAttendance = {};
             response.data.forEach(action => {
                 initialAttendance[action.id] = {};
                 if (action.volunteers) {
                     action.volunteers.forEach(volunteer => {
-                        // Assuming attendance status is returned from backend
                         initialAttendance[action.id][volunteer.username] = volunteer.present || false;
                     });
                 }
@@ -53,10 +53,9 @@ function PostedActionsModal({ isOpen, onClose }) {
         return [...actions].sort((a, b) => {
             switch (sortBy) {
                 case 'date':
-                    // Parse dates carefully, handle potential null/undefined
                     const dateA = a.actionDate ? new Date(a.actionDate) : null;
                     const dateB = b.actionDate ? new Date(b.actionDate) : null;
-                    if (!dateA || !dateB) return 0; // Handle cases with missing dates
+                    if (!dateA || !dateB) return 0;
                     return dateA - dateB;
                 case 'title':
                     return a.title.localeCompare(b.title);
@@ -85,7 +84,6 @@ function PostedActionsModal({ isOpen, onClose }) {
     const handleSaveAttendance = async (actionId) => {
         setSaveStatus(prev => ({ ...prev, [actionId]: 'saving' }));
 
-        // Construct the attendance data in the correct format (List<VolunteerAttendanceDTO>)
         const attendanceData = Object.keys(attendance[actionId] || {}).map(username => ({
             username: username,
             present: attendance[actionId][username]
@@ -93,17 +91,77 @@ function PostedActionsModal({ isOpen, onClose }) {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.post(`http://localhost:8080/api/entity/actions/${actionId}/attendance`, attendanceData, { // Send attendanceData directly
+            await axios.post(`http://localhost:8080/api/entity/actions/${actionId}/attendance`, attendanceData, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
             setSaveStatus(prev => ({ ...prev, [actionId]: 'saved' }));
-            // Optionally refetch actions to update displayed status if needed
-            // fetchPostedActions();
         } catch (err) {
             console.error('Error saving attendance:', err);
             setSaveStatus(prev => ({ ...prev, [actionId]: 'error' }));
+        }
+    };
+
+    const handleDeleteAction = async (actionId) => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://localhost:8080/api/entity/actions/${actionId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setPostedActions(prev => prev.filter(action => action.id !== actionId));
+            setDeleteConfirm(null);
+        } catch (err) {
+            console.error('Error deleting action:', err);
+            alert('Eroare la ștergerea acțiunii');
+        }
+    };
+
+    const startEditAction = (action) => {
+        setEditingAction({
+            id: action.id,
+            title: action.title,
+            description: action.description,
+            location: action.location,
+            locationLat: action.locationLat,
+            locationLng: action.locationLng,
+            category: action.category,
+            requestedVolunteers: action.requestedVolunteers,
+            actionDate: action.actionDate ? new Date(action.actionDate).toISOString().slice(0, 16) : '',
+        });
+    };
+
+    const handleUpdateAction = async () => {
+        if (!editingAction) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            const updateData = {
+                title: editingAction.title,
+                description: editingAction.description,
+                location: editingAction.location,
+                locationLat: editingAction.locationLat,
+                locationLng: editingAction.locationLng,
+                category: editingAction.category,
+                requestedVolunteers: editingAction.requestedVolunteers,
+                actionDate: editingAction.actionDate ? new Date(editingAction.actionDate).toISOString() : null,
+                type: 'voluntariat',
+                rewardItems: []
+            };
+
+            await axios.put(`http://localhost:8080/api/entity/actions/${editingAction.id}`, updateData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            await fetchPostedActions();
+            setEditingAction(null);
+        } catch (err) {
+            console.error('Error updating action:', err);
+            alert('Eroare la actualizarea acțiunii: ' + (err.response?.data || err.message));
         }
     };
 
@@ -149,7 +207,25 @@ function PostedActionsModal({ isOpen, onClose }) {
                             <div className="actions-list">
                                 {sortActions(postedActions).map(action => (
                                     <div key={action.id} className="action-item">
-                                        <h3>{action.title}</h3>
+                                        <div className="action-header">
+                                            <h3>{action.title}</h3>
+                                            <div className="action-buttons">
+                                                <button 
+                                                    className="edit-btn"
+                                                    onClick={() => startEditAction(action)}
+                                                    title="Editează acțiunea"
+                                                >
+                                                    ✏️ Editează
+                                                </button>
+                                                <button 
+                                                    className="delete-btn"
+                                                    onClick={() => setDeleteConfirm(action.id)}
+                                                    title="Șterge acțiunea"
+                                                >
+                                                    🗑️ Șterge
+                                                </button>
+                                            </div>
+                                        </div>
                                         <p className="description">{action.description}</p>
                                         <div className="action-details">
                                             <p><strong>Data:</strong> {new Date(action.actionDate).toLocaleString()}</p>
@@ -215,6 +291,118 @@ function PostedActionsModal({ isOpen, onClose }) {
                         </>
                     )}
                 </div>
+
+                {deleteConfirm && (
+                    <div className="confirm-overlay">
+                        <div className="confirm-dialog">
+                            <h3>Confirmare ștergere</h3>
+                            <p>Ești sigur că vrei să ștergi această acțiune? Acțiunea nu poate fi recuperată.</p>
+                            <div className="confirm-buttons">
+                                <button 
+                                    className="confirm-yes"
+                                    onClick={() => handleDeleteAction(deleteConfirm)}
+                                >
+                                    Da, șterge
+                                </button>
+                                <button 
+                                    className="confirm-no"
+                                    onClick={() => setDeleteConfirm(null)}
+                                >
+                                    Anulează
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {editingAction && (
+                    <div className="edit-overlay">
+                        <div className="edit-dialog">
+                            <h3>Editează acțiunea</h3>
+                            <div className="edit-form">
+                                <label>
+                                    Titlu:
+                                    <input 
+                                        type="text"
+                                        value={editingAction.title}
+                                        onChange={(e) => setEditingAction({...editingAction, title: e.target.value})}
+                                    />
+                                </label>
+                                <label>
+                                    Descriere:
+                                    <textarea 
+                                        value={editingAction.description}
+                                        onChange={(e) => setEditingAction({...editingAction, description: e.target.value})}
+                                    />
+                                </label>
+                                <label>
+                                    Locație:
+                                    <div style={{ marginTop: '8px' }}>
+                                        <LocationAutocompleteMap
+                                            value={editingAction.location}
+                                            coords={editingAction.locationLat && editingAction.locationLng 
+                                                ? [editingAction.locationLat, editingAction.locationLng] 
+                                                : null}
+                                            onLocationSelect={({ address, lat, lng }) => 
+                                                setEditingAction({
+                                                    ...editingAction, 
+                                                    location: address, 
+                                                    locationLat: lat, 
+                                                    locationLng: lng
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                </label>
+                                <label>
+                                    Categorie:
+                                    <select 
+                                        value={editingAction.category}
+                                        onChange={(e) => setEditingAction({...editingAction, category: e.target.value})}
+                                    >
+                                        <option value="mediu">Mediu</option>
+                                        <option value="educatie">Educație</option>
+                                        <option value="social">Social</option>
+                                        <option value="sanatate">Sănătate</option>
+                                        <option value="animale">Animale</option>
+                                        <option value="altele">Altele</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Număr voluntari:
+                                    <input 
+                                        type="number"
+                                        min="0"
+                                        value={editingAction.requestedVolunteers}
+                                        onChange={(e) => setEditingAction({...editingAction, requestedVolunteers: parseInt(e.target.value) || 0})}
+                                    />
+                                </label>
+                                <label>
+                                    Data și ora:
+                                    <input 
+                                        type="datetime-local"
+                                        value={editingAction.actionDate}
+                                        onChange={(e) => setEditingAction({...editingAction, actionDate: e.target.value})}
+                                    />
+                                </label>
+                                <div className="edit-buttons">
+                                    <button 
+                                        className="save-btn"
+                                        onClick={handleUpdateAction}
+                                    >
+                                        Salvează
+                                    </button>
+                                    <button 
+                                        className="cancel-btn"
+                                        onClick={() => setEditingAction(null)}
+                                    >
+                                        Anulează
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

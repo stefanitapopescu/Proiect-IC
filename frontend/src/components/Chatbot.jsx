@@ -12,7 +12,6 @@ const Chatbot = () => {
     ]);
     const [inputMessage, setInputMessage] = useState('');
     const [isTyping, setIsTyping] = useState(false);
-    const [quickQuestions, setQuickQuestions] = useState([]);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -75,12 +74,6 @@ const Chatbot = () => {
         }
     };
 
-    /* DEZACTIVAT - Nu mai folosim întrebări rapide
-    const handleQuickQuestion = (question) => {
-        sendMessage(question.text);
-    };
-    */
-
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -97,7 +90,6 @@ const Chatbot = () => {
 
     return (
         <div className="chatbot-container">
-            {/* Buton pentru deschiderea chatbot-ului */}
             <button
                 className={`chatbot-toggle ${isOpen ? 'open' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
@@ -106,7 +98,6 @@ const Chatbot = () => {
                 Ajutor Virtual
             </button>
 
-            {/* Fereastra chatbot-ului */}
             {isOpen && (
                 <div className="chatbot-window">
                     <div className="chatbot-header">
@@ -152,25 +143,6 @@ const Chatbot = () => {
 
                         <div ref={messagesEndRef} />
                     </div>
-
-                    {/* Întrebări rapide - DEZACTIVATE
-                    {quickQuestions.length > 0 && messages.length <= 1 && (
-                        <div className="quick-questions">
-                            <p>Întrebări frecvente:</p>
-                            <div className="quick-questions-grid">
-                                {quickQuestions.map((question, index) => (
-                                    <button
-                                        key={index}
-                                        className="quick-question-btn"
-                                        onClick={() => handleQuickQuestion(question)}
-                                    >
-                                        {question.text}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                    */}
 
                     <div className="chatbot-input">
                         <div className="input-container">
